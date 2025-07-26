@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shopping Cart | LUXORA</title>
+  <title>Shopping Cart | LUXORA</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cart.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/notifications.css">  <!-- NEW -->
+  <link rel="stylesheet" href="css/modals.css">        <!-- NEW -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="main-header">
+    <div class="header-container">
+      <div class="logo">
+        <h2><a href="index.html">LUXORA</a></h2>
+      </div>
+      
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search products, brands and categories...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+      </div>
+      
+      <nav class="header-nav">
+        <a href="cart.html" id="cart-link" class="cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart (<span id="cart-count">0</span>)
+        </a>
+        
+        <div class="user-dropdown" id="user-dropdown">
+          <button class="user-dropdown-btn" id="user-dropdown-btn">
+            <i class="fas fa-user"></i>
+            <span id="user-name">Account</span>
+            <span class="admin-badge" id="admin-badge" style="display: none;">Admin</span>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+          </button>
+          
+          <div class="dropdown-menu" id="dropdown-menu">
+            <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;">
+              <i class="fas fa-tachometer-alt"></i>
+              Admin Panel
+            </a>
+            <a href="#" class="dropdown-item" id="orders-link">
+              <i class="fas fa-box"></i>
+              My Orders
+            </a>
+            <a href="#" class="dropdown-item" id="wishlist-link">
+              <i class="fas fa-heart"></i>
+              Wishlist
+            </a>
+            <a href="#" class="dropdown-item" id="account-link">
+              <i class="fas fa-user-cog"></i>
+              Account Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="login.html" class="dropdown-item" id="login-link">
+              <i class="fas fa-sign-in-alt"></i>
+              Login
+            </a>
+            <a href="#" class="dropdown-item" id="logout-link" style="display: none;">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Shopping Cart</span>
+      </div>
+
+      <div class="cart-header">
+        <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+        <div class="cart-actions">
+          <button id="clear-cart" class="btn-secondary">
+            <i class="fas fa-trash"></i> Clear Cart
+          </button>
+          <a href="index.html" class="btn-outline">
+            <i class="fas fa-arrow-left"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <div class="cart-content">
+        <div class="cart-items" id="cart-items">
+          <!-- Cart items will be loaded here -->
+        </div>
+
+        <div class="cart-summary">
+          <div class="summary-card">
+            <h3>Order Summary</h3>
+            <div class="summary-row">
+              <span>Subtotal (<span id="summary-items">0</span> items)</span>
+              <span id="summary-subtotal">₦0</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span id="summary-shipping">₦0</span>
+            </div>
+            <div class="summary-row discount-row" id="discount-row" style="display: none;">
+              <span>Discount</span>
+              <span id="summary-discount">-₦0</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row total-row">
+              <span>Total</span>
+              <span id="summary-total">₦0</span>
+            </div>
+            
+            <div class="promo-code">
+              <h4>Promo Code</h4>
+              <form id="promo-form">
+                <div class="promo-input">
+                  <input type="text" id="promo-code" placeholder="Enter promo code">
+                  <button type="submit">Apply</button>
+                </div>
+              </form>
+            </div>
+
+            <button id="checkout-btn" class="btn-primary btn-full">
+              <i class="fas fa-lock"></i> Proceed to Checkout
+            </button>
+
+            <div class="payment-methods">
+              <h4>We Accept</h4>
+              <div class="payment-icons">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+                <i class="fas fa-university"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Cart State -->
+      <div class="empty-cart" id="empty-cart" style="display: none;">
+        <div class="empty-cart-content">
+          <i class="fas fa-shopping-cart"></i>
+          <h2>Your cart is empty</h2>
+          <p>Looks like you haven't added any items to your cart yet.</p>
+          <a href="index.html" class="btn-primary">
+            <i class="fas fa-arrow-left"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- Recently Viewed -->
+      <section class="recently-viewed" id="recently-viewed">
+        <h2>Recently Viewed</h2>
+        <div class="product-grid" id="recently-viewed-grid">
+          <!-- Recently viewed products will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Recommended Products -->
+      <section class="recommended-products">
+        <h2>You Might Also Like</h2>
+        <div class="product-grid" id="recommended-grid">
+          <!-- Recommended products will be loaded here -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/common.js"></script> 
+  <script src="js/header.js"></script>
+  <script src="js/cart.js"></script>
+
+</body>
+</html>

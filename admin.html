@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | LUXORA</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/notifications.css">  <!-- NEW -->
+  <link rel="stylesheet" href="css/modals.css">        <!-- NEW -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="main-header">
+    <div class="header-container">
+      <div class="logo">
+        <h2><a href="index.html">LUXORA</a></h2>
+      </div>
+      
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search products, brands and categories...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+      </div>
+      
+      <nav class="header-nav">
+        <a href="cart.html" id="cart-link" class="cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart (<span id="cart-count">0</span>)
+        </a>
+        
+        <div class="user-dropdown" id="user-dropdown">
+          <button class="user-dropdown-btn" id="user-dropdown-btn">
+            <i class="fas fa-user"></i>
+            <span id="user-name">Account</span>
+            <span class="admin-badge" id="admin-badge" style="display: none;">Admin</span>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+          </button>
+          
+          <div class="dropdown-menu" id="dropdown-menu">
+            <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;">
+              <i class="fas fa-tachometer-alt"></i>
+              Admin Panel
+            </a>
+            <a href="#" class="dropdown-item" id="orders-link">
+              <i class="fas fa-box"></i>
+              My Orders
+            </a>
+            <a href="#" class="dropdown-item" id="wishlist-link">
+              <i class="fas fa-heart"></i>
+              Wishlist
+            </a>
+            <a href="#" class="dropdown-item" id="account-link">
+              <i class="fas fa-user-cog"></i>
+              Account Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="login.html" class="dropdown-item" id="login-link">
+              <i class="fas fa-sign-in-alt"></i>
+              Login
+            </a>
+            <a href="#" class="dropdown-item" id="logout-link" style="display: none;">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="admin-container">
+      <aside class="admin-sidebar">
+        <nav class="admin-nav">
+          <a href="#" class="nav-item active" data-section="dashboard">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+          <a href="#" class="nav-item" data-section="products">
+            <i class="fas fa-box"></i> Products
+          </a>
+          <a href="#" class="nav-item" data-section="orders">
+            <i class="fas fa-shopping-cart"></i> Orders
+          </a>
+          <a href="#" class="nav-item" data-section="users">
+            <i class="fas fa-users"></i> Users
+          </a>
+          <a href="#" class="nav-item" data-section="analytics">
+            <i class="fas fa-chart-bar"></i> Analytics
+          </a>
+          <a href="#" class="nav-item" data-section="settings">
+            <i class="fas fa-cog"></i> Settings
+          </a>
+        </nav>
+      </aside>
+
+      <div class="admin-content">
+        <!-- Dashboard Section -->
+        <section class="admin-section active" id="dashboard-section">
+          <div class="section-header">
+            <h1>Dashboard</h1>
+            <div class="date-range">
+              <i class="fas fa-calendar"></i>
+              <span id="current-date"></span>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Revenue</h3>
+                <p class="stat-value">₦2,450,000</p>
+                <span class="stat-change positive">+12.5%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Orders</h3>
+                <p class="stat-value">1,234</p>
+                <span class="stat-change positive">+8.2%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Users</h3>
+                <p class="stat-value">5,678</p>
+                <span class="stat-change positive">+15.3%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-box"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Products</h3>
+                <p class="stat-value" id="total-products">0</p>
+                <span class="stat-change neutral">Managed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-charts">
+            <div class="chart-card">
+              <h3>Recent Orders</h3>
+              <div class="orders-list">
+                <div class="order-item">
+                  <div class="order-info">
+                    <strong>#ORD-001</strong>
+                    <span>John Doe</span>
+                  </div>
+                  <div class="order-status">
+                    <span class="status delivered">Delivered</span>
+                    <span class="amount">₦45,000</span>
+                  </div>
+                </div>
+                <div class="order-item">
+                  <div class="order-info">
+                    <strong>#ORD-002</strong>
+                    <span>Jane Smith</span>
+                  </div>
+                  <div class="order-status">
+                    <span class="status pending">Pending</span>
+                    <span class="amount">₦32,500</span>
+                  </div>
+                </div>
+                <div class="order-item">
+                  <div class="order-info">
+                    <strong>#ORD-003</strong>
+                    <span>Mike Johnson</span>
+                  </div>
+                  <div class="order-status">
+                    <span class="status processing">Processing</span>
+                    <span class="amount">₦78,900</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Quick Actions</h3>
+              <div class="quick-actions">
+                <button class="action-btn" data-action="add-product">
+                  <i class="fas fa-plus"></i>
+                  Add Product
+                </button>
+                <button class="action-btn" data-action="view-orders">
+                  <i class="fas fa-list"></i>
+                  View Orders
+                </button>
+                <button class="action-btn" data-action="manage-users">
+                  <i class="fas fa-user-cog"></i>
+                  Manage Users
+                </button>
+                <button class="action-btn" data-action="settings">
+                  <i class="fas fa-cog"></i>
+                  Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Products Section -->
+        <section class="admin-section" id="products-section">
+          <div class="section-header">
+            <h1>Products Management</h1>
+            <button class="btn-primary" id="add-product-btn">
+              <i class="fas fa-plus"></i> Add Product
+            </button>
+          </div>
+
+          <div class="products-controls">
+            <div class="search-bar">
+              <input type="text" id="product-search" placeholder="Search products...">
+              <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-controls">
+              <select id="category-filter-admin">
+                <option value="">All Categories</option>
+                <option value="electronics">Electronics</option>
+                <option value="fashion">Fashion</option>
+                <option value="home">Home & Living</option>
+                <option value="beauty">Beauty</option>
+              </select>
+              <select id="status-filter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="out-of-stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="products-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Products will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section class="admin-section" id="orders-section">
+          <div class="section-header">
+            <h1>Orders Management</h1>
+            <div class="order-stats">
+              <span class="stat pending">Pending: 15</span>
+              <span class="stat processing">Processing: 8</span>
+              <span class="stat delivered">Delivered: 142</span>
+            </div>
+          </div>
+
+          <div class="orders-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <tr>
+                  <td>#ORD-001</td>
+                  <td>John Doe</td>
+                  <td>2025-01-02</td>
+                  <td>₦45,000</td>
+                  <td><span class="status delivered">Delivered</span></td>
+                  <td>
+                    <button class="btn-sm">View</button>
+                    <button class="btn-sm">Edit</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>#ORD-002</td>
+                  <td>Jane Smith</td>
+                  <td>2025-01-02</td>
+                  <td>₦32,500</td>
+                  <td><span class="status pending">Pending</span></td>
+                  <td>
+                    <button class="btn-sm">View</button>
+                    <button class="btn-sm">Edit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Users Section -->
+        <section class="admin-section" id="users-section">
+          <div class="section-header">
+            <h1>Users Management</h1>
+            <button class="btn-primary" id="add-user-btn">
+              <i class="fas fa-plus"></i> Add User
+            </button>
+          </div>
+
+          <div class="users-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Join Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Users will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section class="admin-section" id="analytics-section">
+          <div class="section-header">
+            <h1>Analytics</h1>
+            <div class="date-filter">
+              <select id="analytics-period">
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 3 months</option>
+                <option value="365">Last year</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <h3>Sales Overview</h3>
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-line"></i>
+                <p>Sales chart would be displayed here</p>
+              </div>
+            </div>
+            <div class="analytics-card">
+              <h3>Top Categories</h3>
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-pie"></i>
+                <p>Category breakdown chart</p>
+              </div>
+            </div>
+            <div class="analytics-card">
+              <h3>User Growth</h3>
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <p>User growth chart</p>
+              </div>
+            </div>
+            <div class="analytics-card">
+              <h3>Revenue Trends</h3>
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-area"></i>
+                <p>Revenue trends chart</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="admin-section" id="settings-section">
+          <div class="section-header">
+            <h1>Settings</h1>
+          </div>
+
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3>Site Settings</h3>
+              <form id="site-settings-form">
+                <div class="form-group">
+                  <label for="site-name">Site Name</label>
+                  <input type="text" id="site-name" value="LUXORA">
+                </div>
+                <div class="form-group">
+                  <label for="site-description">Site Description</label>
+                  <textarea id="site-description">Your No.1 Online Shopping Destination</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="contact-email">Contact Email</label>
+                  <input type="email" id="contact-email" value="contact@luxora.com">
+                </div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+              </form>
+            </div>
+            <div class="settings-card">
+              <h3>Notification Settings</h3>
+              <form id="notification-settings-form">
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" checked>
+                    Email notifications for new orders
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" checked>
+                    SMS notifications for urgent issues
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox">
+                    Daily sales reports
+                  </label>
+                </div>
+                <button type="submit" class="btn-primary">Save Settings</button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Product Modal -->
+  <div class="modal" id="product-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Add Product</h2>
+        <button class="close-btn" id="close-modal">&times;</button>
+      </div>
+      <form id="product-form">
+        <div class="form-group">
+          <label for="product-name">Product Name</label>
+          <input type="text" id="product-name" required>
+        </div>
+        <div class="form-group">
+          <label for="product-category">Category</label>
+          <select id="product-category" required>
+            <option value="">Select Category</option>
+            <option value="electronics">Electronics</option>
+            <option value="fashion">Fashion</option>
+            <option value="home">Home & Living</option>
+            <option value="beauty">Beauty</option>
+            <option value="phones">Phones</option>
+            <option value="computing">Computing</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="product-price">Price (₦)</label>
+          <input type="number" id="product-price" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="product-old-price">Old Price (₦)</label>
+          <input type="number" id="product-old-price" min="0">
+        </div>
+        <div class="form-group">
+          <label for="product-stock">Stock Quantity</label>
+          <input type="number" id="product-stock" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="product-description">Description</label>
+          <textarea id="product-description" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="product-image">Image URL</label>
+          <input type="url" id="product-image" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="cancel-product">Cancel</button>
+          <button type="submit" class="btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/header.js"></script>
+  <script src="js/admin.js"></script>
+
+</body>
+</html>

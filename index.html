@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LUXORA – Your No.1 Online Shopping Destination</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/notifications.css">  <!-- NEW -->
+  <link rel="stylesheet" href="css/modals.css">        <!-- NEW -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="main-header">
+    <div class="header-container">
+      <div class="logo">
+        <h2><a href="index.html">LUXORA</a></h2>
+      </div>
+      
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search products, brands and categories...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+      </div>
+      
+      <nav class="header-nav">
+        <a href="cart.html" id="cart-link" class="cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart (<span id="cart-count">0</span>)
+        </a>
+        
+        <div class="user-dropdown" id="user-dropdown">
+          <button class="user-dropdown-btn" id="user-dropdown-btn">
+            <i class="fas fa-user"></i>
+            <span id="user-name">Account</span>
+            <span class="admin-badge" id="admin-badge" style="display: none;">Admin</span>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+          </button>
+          
+          <div class="dropdown-menu" id="dropdown-menu">
+            <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;">
+              <i class="fas fa-tachometer-alt"></i>
+              Admin Panel
+            </a>
+            <a href="#" class="dropdown-item" id="orders-link">
+              <i class="fas fa-box"></i>
+              My Orders
+            </a>
+            <a href="#" class="dropdown-item" id="wishlist-link">
+              <i class="fas fa-heart"></i>
+              Wishlist
+            </a>
+            <a href="#" class="dropdown-item" id="account-link">
+              <i class="fas fa-user-cog"></i>
+              Account Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="login.html" class="dropdown-item" id="login-link">
+              <i class="fas fa-sign-in-alt"></i>
+              Login
+            </a>
+            <a href="#" class="dropdown-item" id="logout-link" style="display: none;">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-container">
+          <!-- Left: Category list -->
+          <aside class="hero-categories">
+            <h3>Categories</h3>
+            <ul>
+              <li><a href="#" data-category="appliances"><i class="fas fa-plug"></i> Appliances</a></li>
+              <li><a href="#" data-category="phones"><i class="fas fa-mobile-alt"></i> Phones & Tablets</a></li>
+              <li><a href="#" data-category="beauty"><i class="fas fa-heart"></i> Health & Beauty</a></li>
+              <li><a href="#" data-category="home"><i class="fas fa-home"></i> Home & Office</a></li>
+              <li><a href="#" data-category="electronics"><i class="fas fa-tv"></i> Electronics</a></li>
+              <li><a href="#" data-category="fashion"><i class="fas fa-tshirt"></i> Fashion</a></li>
+              <li><a href="#" data-category="supermarket"><i class="fas fa-shopping-basket"></i> Supermarket</a></li>
+              <li><a href="#" data-category="computing"><i class="fas fa-laptop"></i> Computing</a></li>
+              <li><a href="#" data-category="baby"><i class="fas fa-baby"></i> Baby Products</a></li>
+              <li><a href="#" data-category="gaming"><i class="fas fa-gamepad"></i> Gaming</a></li>
+            </ul>
+          </aside>
+
+          <!-- Center: Banner Slider -->
+          <div class="hero-banner">
+            <div class="slider" id="hero-slider">
+              <div class="slide active">
+                <img src="images/banner1.jpg" alt="Flash Sale Week" class="slide-image">
+                <div class="slide-content">
+                  <h2>Flash Sale Week</h2>
+                  <p>Up to 70% off on selected items</p>
+                  <a href="flash-sales.html" class="shop-now-btn">Shop Now</a>
+                </div>
+              </div>
+              <div class="slide">
+                <img src="images/banner2.jpg" alt="New Electronics" class="slide-image">
+                <div class="slide-content">
+                  <h2>New Electronics</h2>
+                  <p>Latest smartphones and gadgets</p>
+                  <a href="#" class="shop-now-btn">Explore</a>
+                </div>
+              </div>
+              <div class="slide">
+                <img src="images/banner3.jpg" alt="Fashion Week" class="slide-image">
+                <div class="slide-content">
+                  <h2>Fashion Week</h2>
+                  <p>Trending styles for men and women</p>
+                  <a href="#" class="shop-now-btn">Shop Fashion</a>
+                </div>
+              </div>
+              <div class="slide">
+                <img src="images/banner4.jpg" alt="Home & Living" class="slide-image">
+                <div class="slide-content">
+                  <h2>Home & Living</h2>
+                  <p>Transform your space with our collection</p>
+                  <a href="#" class="shop-now-btn">Shop Home</a>
+                </div>
+              </div>
+            </div>
+            <div class="slider-indicators">
+              <span class="indicator active" data-slide="0"></span>
+              <span class="indicator" data-slide="1"></span>
+              <span class="indicator" data-slide="2"></span>
+              <span class="indicator" data-slide="3"></span>
+            </div>
+          </div>
+
+          <!-- Right: Quick Links -->
+          <aside class="hero-quicklinks">
+            <div class="quicklink">
+              <i class="fas fa-phone"></i>
+              <div>
+                <strong>CALL TO ORDER</strong>
+                <p>0700-600-0000<br>02018881106</p>
+              </div>
+            </div>
+            <div class="quicklink">
+              <i class="fas fa-store"></i>
+              <a href="#">Sell on Luxora</a>
+            </div>
+            <div class="quicklink">
+              <i class="fas fa-shipping-fast"></i>
+              <a href="#">Express Delivery</a>
+            </div>
+            <div class="quicklink orange">
+              <i class="fas fa-star"></i>
+              <a href="#">LUXORA PRIME<br/>JOIN NOW</a>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Flash Sales Section -->
+      <section class="flash-sales-section">
+        <div class="section-header">
+          <h2><i class="fas fa-bolt"></i> Flash Sales</h2>
+          <div class="flash-timer">
+            <span class="timer-label">Ends in:</span>
+            <span class="countdown" id="home-countdown">12h : 00m : 00s</span>
+          </div>
+          <a href="flash-sales.html" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="flash-sales-products" id="flash-sales-home">
+          <div class="loading">Loading products...</div>
+        </div>
+      </section>
+
+      <!-- Top Sellers Section -->
+      <section class="product-grid-section">
+        <div class="section-header">
+          <h2><i class="fas fa-trophy"></i> Top Sellers</h2>
+          <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="product-grid" id="top-sellers-grid">
+          <div class="loading">Loading products...</div>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section class="categories-section">
+        <h2>Shop by Category</h2>
+        <div class="categories-grid">
+          <div class="category-card" data-category="electronics">
+            <i class="fas fa-tv"></i>
+            <h3>Electronics</h3>
+            <p>Latest gadgets & tech</p>
+          </div>
+          <div class="category-card" data-category="fashion">
+            <i class="fas fa-tshirt"></i>
+            <h3>Fashion</h3>
+            <p>Trending styles</p>
+          </div>
+          <div class="category-card" data-category="home">
+            <i class="fas fa-home"></i>
+            <h3>Home & Living</h3>
+            <p>Transform your space</p>
+          </div>
+          <div class="category-card" data-category="beauty">
+            <i class="fas fa-heart"></i>
+            <h3>Beauty</h3>
+            <p>Health & personal care</p>
+          </div>
+          <div class="category-card" data-category="phones">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Phones</h3>
+            <p>Latest smartphones</p>
+          </div>
+          <div class="category-card" data-category="computing">
+            <i class="fas fa-laptop"></i>
+            <h3>Computing</h3>
+            <p>Laptops & accessories</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- New Arrivals Section -->
+      <section class="product-grid-section">
+        <div class="section-header">
+          <h2><i class="fas fa-star"></i> New Arrivals</h2>
+          <a href="#" class="see-all">See All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="product-grid" id="new-arrivals-grid">
+          <div class="loading">Loading products...</div>
+        </div>
+      </section>
+
+      <!-- About the Platform Section -->
+      <section class="about-platform">
+        <h2>LUXORA Nigeria – Your No.1 Online Shopping Destination</h2>
+        <p>
+          LUXORA Nigeria is the country's largest online shopping platform, letting customers nationwide buy everything they need easily from the website or mobile app. You can shop from the comfort of your home or workplace and get fast delivery on thousands of items, including fashion, electronics, groceries, mobile phones, computers, and much more.
+        </p>
+        <div class="about-features">
+          <div class="feature">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Original Products</h3>
+            <p>Authentic products from top brands at unbeatable prices</p>
+          </div>
+          <div class="feature">
+            <i class="fas fa-shipping-fast"></i>
+            <h3>Fast Delivery</h3>
+            <p>Express delivery within 24 hours for selected items</p>
+          </div>
+          <div class="feature">
+            <i class="fas fa-credit-card"></i>
+            <h3>Secure Payment</h3>
+            <p>Multiple payment options with secure transactions</p>
+          </div>
+          <div class="feature">
+            <i class="fas fa-headset"></i>
+            <h3>24/7 Support</h3>
+            <p>Customer service available round the clock</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="newsletter-content">
+        <h3>Stay Updated with LUXORA</h3>
+        <p>Subscribe to our newsletter for exclusive deals and latest updates</p>
+        <form id="newsletter-form" class="newsletter-form">
+          <input type="email" id="newsletter-email" placeholder="Enter your email address" required>
+          <button type="submit" class="btn-primary">Subscribe</button>
+        </form>
+        <div class="newsletter-benefits">
+          <span><i class="fas fa-check"></i> Exclusive deals</span>
+          <span><i class="fas fa-check"></i> New arrivals</span>
+          <span><i class="fas fa-check"></i> Special offers</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <h4>NEW TO LUXORA?</h4>
+            <p>Subscribe to our newsletter to get updates on our latest offers!</p>
+            <form class="footer-newsletter">
+              <input type="email" placeholder="Enter E-mail Address" required />
+              <button type="submit">Subscribe</button>
+            </form>
+            <div class="policy-links">
+              <label>
+                <input type="checkbox" required />
+                I agree to LUXORA's Privacy and Cookie Policy
+              </label>
+              <a href="#" class="legal-terms">I accept the Legal Terms</a>
+            </div>
+          </div>
+          <div class="col">
+            <h4>DOWNLOAD LUXORA FREE APP</h4>
+            <p>Get access to exclusive offers!</p>
+            <div class="app-links">
+              <a href="#" target="_blank" class="app-store">
+                <i class="fab fa-apple"></i>
+                <div>
+                  <span>Download on the</span>
+                  <strong>App Store</strong>
+                </div>
+              </a>
+              <a href="#" target="_blank" class="google-play">
+                <i class="fab fa-google-play"></i>
+                <div>
+                  <span>Get it on</span>
+                  <strong>Google Play</strong>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-middle">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <h4>NEED HELP?</h4>
+            <ul>
+              <li><a href="#"><i class="fas fa-comments"></i> Chat with us</a></li>
+              <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+              <li><a href="#"><i class="fas fa-envelope"></i> Contact Us</a></li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>ABOUT LUXORA</h4>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Our Blog</a></li>
+              <li><a href="#">Terms & Conditions</a></li>
+              <li><a href="#">Privacy Notice</a></li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>PAYMENT METHODS & DELIVERY</h4>
+            <div class="payment-methods">
+              <img src="images/visa.png" alt="Visa" />
+              <img src="images/mastercard.png" alt="Mastercard" />
+              <img src="images/paypal.png" alt="PayPal" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2025 LUXORA. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>           
+  <script src="js/storage.js"></script>         
+  <script src="js/products-data.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/header.js"></script>
+  <script src="js/slider.js"></script>
+  <script src="js/home.js"></script>
+
+</body>
+</html>

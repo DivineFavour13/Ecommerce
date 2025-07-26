@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flash Sales | LUXORA</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/flash-sales.css">
+  <link rel="stylesheet" href="css/notifications.css">  <!-- NEW -->
+  <link rel="stylesheet" href="css/modals.css">        <!-- NEW -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <h2><a href="index.html">LUXORA</a></h2>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search flash sales...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+      </div>
+      <nav class="header-nav">
+        <a href="cart.html" id="cart-link" class="cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart (<span id="cart-count">0</span>)
+        </a>
+        <a href="login.html" id="auth-link" class="auth-link">
+          <i class="fas fa-user"></i>
+          <span id="auth-text">Login</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Flash Sales</span>
+      </div>
+
+      <div class="flash-sales-hero">
+        <div class="flash-header">
+          <h1><i class="fas fa-bolt"></i> Flash Sales</h1>
+          <div class="flash-timer-large">
+            <div class="timer-label">Sale ends in:</div>
+            <div class="countdown-large" id="flash-countdown">
+              <div class="time-unit">
+                <span class="time-value" id="hours">12</span>
+                <span class="time-label">Hours</span>
+              </div>
+              <div class="time-separator">:</div>
+              <div class="time-unit">
+                <span class="time-value" id="minutes">00</span>
+                <span class="time-label">Minutes</span>
+              </div>
+              <div class="time-separator">:</div>
+              <div class="time-unit">
+                <span class="time-value" id="seconds">00</span>
+                <span class="time-label">Seconds</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flash-stats">
+          <div class="stat">
+            <i class="fas fa-fire"></i>
+            <div>
+              <span class="stat-number">70%</span>
+              <span class="stat-label">Max Discount</span>
+            </div>
+          </div>
+          <div class="stat">
+            <i class="fas fa-shopping-bag"></i>
+            <div>
+              <span class="stat-number" id="flash-items-count">0</span>
+              <span class="stat-label">Items on Sale</span>
+            </div>
+          </div>
+          <div class="stat">
+            <i class="fas fa-users"></i>
+            <div>
+              <span class="stat-number">12K+</span>
+              <span class="stat-label">Happy Customers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <label for="category-filter">Category:</label>
+          <select id="category-filter">
+            <option value="">All Categories</option>
+            <option value="electronics">Electronics</option>
+            <option value="fashion">Fashion</option>
+            <option value="home">Home & Living</option>
+            <option value="beauty">Beauty</option>
+            <option value="phones">Phones</option>
+            <option value="computing">Computing</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="price-filter">Price Range:</label>
+          <select id="price-filter">
+            <option value="">All Prices</option>
+            <option value="0-50000">Under ₦50,000</option>
+            <option value="50000-100000">₦50,000 - ₦100,000</option>
+            <option value="100000-200000">₦100,000 - ₦200,000</option>
+            <option value="200000+">Above ₦200,000</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="discount-filter">Discount:</label>
+          <select id="discount-filter">
+            <option value="">All Discounts</option>
+            <option value="20">20% or more</option>
+            <option value="40">40% or more</option>
+            <option value="60">60% or more</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="sort-filter">Sort by:</label>
+          <select id="sort-filter">
+            <option value="discount">Highest Discount</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="popularity">Most Popular</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Flash Sales Products -->
+      <section class="flash-sales-products-section">
+        <div class="section-header">
+          <h2>Flash Sale Items</h2>
+          <div class="view-options">
+            <button class="view-btn active" data-view="grid">
+              <i class="fas fa-th"></i>
+            </button>
+            <button class="view-btn" data-view="list">
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
+        </div>
+        <div class="flash-products-grid" id="flash-products-grid">
+          <div class="loading">Loading flash sale products...</div>
+        </div>
+      </section>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        <!-- Pagination will be loaded here -->
+      </div>
+    </div>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/common.js"></script> 
+  <script src="js/header.js"></script>
+  <script src="js/flash-sales.js"></script>
+
+</body>
+</html>
