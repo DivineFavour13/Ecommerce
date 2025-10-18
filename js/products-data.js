@@ -216,3 +216,8 @@ const products = [
 window.products = products;
 
 console.log('Products loaded:', products.length);
+
+
+
+
+
