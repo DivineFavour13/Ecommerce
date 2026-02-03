@@ -1,5 +1,3 @@
-// utils.js - Utility functions for LUXORA e-commerce
-
 // Price formatting functions
 function formatPrice(price) {
   if (typeof price !== 'number') {
@@ -238,8 +236,15 @@ function sortProducts(products, sortBy) {
 
 // Image utilities
 function handleImageError(img) {
-  img.src = 'https://via.placeholder.com/400x400/f0f0f0/666?text=No+Image';
+  const width = img.width || 400;
+  const height = img.height || 400;
+  img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3Crect fill='%23f0f0f0' width='${width}' height='${height}'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='12' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E`;
   img.alt = 'Image not available';
+}
+
+//SVG placeholder helper
+function getSVGPlaceholder(width = 400, height = 400) {
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3Crect fill='%23f0f0f0' width='${width}' height='${height}'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='12' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E`;
 }
 
 // Debounce function for search

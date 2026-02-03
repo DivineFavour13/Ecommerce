@@ -1,577 +1,631 @@
-document.addEventListener('DOMContentLoaded', () => {
-  initializeLoginPage();
-});
+// =============== LOGIN PAGE FUNCTIONALITY ===============
 
-function initializeLoginPage() {
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   const registerLink = document.getElementById('register-link');
-  const loginLink = document.getElementById('login-link');
-  
-  if (!loginForm) return; // Not on login page
-  
-  setupFormToggling(loginForm, registerForm, registerLink, loginLink);
-  setupPasswordToggle();
-  setupFormValidation();
-  setupSocialLogin();
-  handleLoginForm(loginForm);
-  handleRegisterForm(registerForm);
-  
-  // Check if user is already logged in
-  checkExistingLogin();
-}
-
-// Check if user is already logged in
-function checkExistingLogin() {
-  const currentUser = getCurrentUser();
-  if (currentUser) {
-    showNotification(`Welcome back, ${currentUser.name}!`, 'info');
-    setTimeout(() => {
-      if (currentUser.role === 'admin') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'index.html';
-      }
-    }, 1000);
-  }
-}
-
-// Setup form toggling between login and register
-function setupFormToggling(loginForm, registerForm, registerLink, loginLink) {
-  if (registerLink) {
-    registerLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchToRegisterForm(loginForm, registerForm);
-    });
-  }
-  
-  if (loginLink) {
-    loginLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchToLoginForm(loginForm, registerForm);
-    });
-  }
-}
-
-// Switch to register form
-function switchToRegisterForm(loginForm, registerForm) {
-  // Update form title and subtitle
+  const switchFormText = document.getElementById('switch-form-text');
   const formTitle = document.getElementById('form-title');
   const formSubtitle = document.getElementById('form-subtitle');
+  const passwordToggle = document.getElementById('password-toggle');
+  const passwordInput = document.getElementById('password');
   
-  if (formTitle) formTitle.textContent = 'Create Account';
-  if (formSubtitle) formSubtitle.textContent = 'Join LUXORA today';
-  
-  // Update switch form text
-  const switchFormText = document.getElementById('switch-form-text');
-  if (switchFormText) {
-    switchFormText.innerHTML = 
-      'Already have an account? <a href="#" id="login-link">Sign in</a>';
-  }
-  
-  // Toggle forms with animation
-  if (loginForm) {
-    loginForm.classList.add('fade-out');
-    
+  // State
+  let isLoginForm = true;
+
+  // =============== FORM SWITCHING ===============
+
+  function switchToRegister() {
+    isLoginForm = false;
+
+    // Fade out login form
+    loginForm.style.opacity = '0';
+    loginForm.style.transform = 'translateX(-20px)';
+
     setTimeout(() => {
       loginForm.style.display = 'none';
-      if (registerForm) {
-        registerForm.style.display = 'block';
-        registerForm.classList.add('fade-in');
-      }
-      
-      // Re-setup login link
-      const newLoginLink = document.getElementById('login-link');
-      if (newLoginLink) {
-        newLoginLink.addEventListener('click', (e) => {
-          e.preventDefault();
-          switchToLoginForm(loginForm, registerForm);
-        });
-      }
-    }, 300);
-  }
-}
+      registerForm.style.display = 'block';
 
-// Switch to login form
-function switchToLoginForm(loginForm, registerForm) {
-  // Update form title and subtitle
-  const formTitle = document.getElementById('form-title');
-  const formSubtitle = document.getElementById('form-subtitle');
-  
-  if (formTitle) formTitle.textContent = 'Welcome Back';
-  if (formSubtitle) formSubtitle.textContent = 'Sign in to your LUXORA account';
-  
-  // Update switch form text
-  const switchFormText = document.getElementById('switch-form-text');
-  if (switchFormText) {
-    switchFormText.innerHTML = 
-      'Don\'t have an account? <a href="#" id="register-link">Create one</a>';
+      // Fade in register form
+      setTimeout(() => {
+        registerForm.style.opacity = '1';
+        registerForm.style.transform = 'translateX(0)';
+      }, 50);
+    }, 300);
+
+    // Update header
+    formTitle.textContent = 'Create Account';
+    formSubtitle.textContent = 'Join LUXORA and start shopping';
+    switchFormText.innerHTML = 'Already have an account? <a href="#" id="login-link">Sign in</a>';
   }
-  
-  // Toggle forms with animation
-  if (registerForm) {
-    registerForm.classList.add('fade-out');
-    
+
+  function switchToLogin() {
+    isLoginForm = true;
+
+    // Fade out register form
+    registerForm.style.opacity = '0';
+    registerForm.style.transform = 'translateX(-20px)';
+
     setTimeout(() => {
       registerForm.style.display = 'none';
-      if (loginForm) {
-        loginForm.style.display = 'block';
-        loginForm.classList.add('fade-in');
-      }
-      
-      // Re-setup register link
-      const newRegisterLink = document.getElementById('register-link');
-      if (newRegisterLink) {
-        newRegisterLink.addEventListener('click', (e) => {
-          e.preventDefault();
-          switchToRegisterForm(loginForm, registerForm);
-        });
-      }
-    }, 300);
-  }
-}
+      loginForm.style.display = 'block';
 
-// Setup password toggle functionality
-function setupPasswordToggle() {
-  const passwordToggles = document.querySelectorAll('.password-toggle');
-  
-  passwordToggles.forEach(toggle => {
-    toggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      const input = toggle.previousElementSibling;
-      const icon = toggle.querySelector('i');
-      
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-      } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-      }
-    });
-  });
-}
-
-// Setup form validation
-function setupFormValidation() {
-  // Validate all email fields
-  const emailInputs = document.querySelectorAll('input[type="email"]');
-  emailInputs.forEach(input => {
-    input.addEventListener('blur', () => validateEmailField(input));
-    input.addEventListener('input', () => clearFieldError(input));
-  });
-
-  // Validate all password fields
-  const passwordInputs = document.querySelectorAll('input[type="password"]');
-  passwordInputs.forEach(input => {
-    input.addEventListener('blur', () => {
-      if (input.id === 'register-password') {
-        validatePasswordField(input); // Custom strength check
-      } else {
-        validateField(input); // Simple non-empty check
-      }
-    });
-    input.addEventListener('input', () => clearFieldError(input));
-  });
-
-  // Confirm password field
-  const confirmPasswordInput = document.getElementById('confirm-password');
-  if (confirmPasswordInput) {
-    confirmPasswordInput.addEventListener('blur', () => {
-      validateConfirmPassword();
-    });
-    confirmPasswordInput.addEventListener('input', () => {
-      clearFieldError(confirmPasswordInput);
-    });
-  }
-}
-
-function validateEmailField(input) {
-  const email = input.value.trim();
-  const isValid = validateEmail(email);
-  
-  if (email && !isValid) {
-    showFieldError(input, 'Please enter a valid email address');
-    return false;
-  } else {
-    clearFieldError(input);
-    return true;
-  }
-}
-
-function validatePasswordField(input) {
-  const password = input.value;
-  const validation = validatePasswordStrength(password);
-  
-  if (password && !validation.isValid) {
-    showFieldError(input, 'Password must be at least 8 characters with uppercase, lowercase, and numbers');
-    return false;
-  } else {
-    clearFieldError(input);
-    return true;
-  }
-}
-
-function validateConfirmPassword() {
-  const password = document.getElementById('register-password')?.value;
-  const confirmPassword = document.getElementById('confirm-password')?.value;
-  
-  if (confirmPassword && password !== confirmPassword) {
-    showFieldError(document.getElementById('confirm-password'), 'Passwords do not match');
-    return false;
-  } else {
-    clearFieldError(document.getElementById('confirm-password'));
-    return true;
-  }
-}
-
-function showFieldError(input, message) {
-  clearFieldError(input);
-  
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'field-error';
-  errorDiv.textContent = message;
-  
-  input.parentNode.appendChild(errorDiv);
-  input.classList.add('error');
-}
-
-function clearFieldError(input) {
-  const existingError = input.parentNode.querySelector('.field-error');
-  if (existingError) {
-    existingError.remove();
-  }
-  input.classList.remove('error');
-}
-
-// Setup social login (placeholder)
-function setupSocialLogin() {
-  const socialButtons = document.querySelectorAll('.social-login-btn');
-  
-  socialButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const provider = button.dataset.provider;
-      showNotification(`${provider} login not implemented yet`, 'info');
-    });
-  });
-}
-
-// Handle login form submission
-function handleLoginForm(loginForm) {
-  if (!loginForm) return;
-  
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('email')?.value.trim();
-    const password = document.getElementById('password')?.value;
-    const rememberMe = document.getElementById('remember-me')?.checked;
-    
-    // Validate inputs
-    if (!email) {
-      showNotification('Please enter your email address', 'error');
-      return;
-    }
-    
-    if (!validateEmail(email)) {
-      showNotification('Please enter a valid email address', 'error');
-      return;
-    }
-    
-    if (!password) {
-      showNotification('Please enter your password', 'error');
-      return;
-    }
-    
-    // Show loading state
-    const submitBtn = loginForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Signing in...';
-    submitBtn.disabled = true;
-    
-    // Simulate login delay
-    setTimeout(() => {
-      const success = handleLogin(email, password, rememberMe);
-      
-      // Reset button
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-      
-      if (!success) {
-        // Clear password field on failed login
-        document.getElementById('password').value = '';
-      }
-    }, 1000);
-  });
-}
-
-// Handle register form submission
-function handleRegisterForm(registerForm) {
-  if (!registerForm) return;
-  
-  registerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const name = document.getElementById('register-name')?.value.trim();
-    const email = document.getElementById('register-email')?.value.trim();
-    const password = document.getElementById('register-password')?.value;
-    const confirmPassword = document.getElementById('confirm-password')?.value;
-    const agreeTerms = document.getElementById('agree-terms')?.checked;
-    
-    // Validate inputs
-    if (!name || name.length < 2) {
-      showNotification('Please enter your full name (at least 2 characters)', 'error');
-      return;
-    }
-    
-    if (!email || !validateEmail(email)) {
-      showNotification('Please enter a valid email address', 'error');
-      return;
-    }
-    
-    if (!password || !validatePassword(password)) {
-      showNotification('Password must be at least 6 characters long', 'error');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      showNotification('Passwords do not match', 'error');
-      return;
-    }
-    
-    if (!agreeTerms) {
-      showNotification('Please agree to the terms and conditions', 'error');
-      return;
-    }
-    
-    // Check if user already exists
-    const existingUsers = getUsers();
-    const userExists = existingUsers.some(user => user.email.toLowerCase() === email.toLowerCase());
-    
-    if (userExists) {
-      showNotification('An account with this email already exists', 'error');
-      return;
-    }
-    
-    // Show loading state
-    const submitBtn = registerForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Creating account...';
-    submitBtn.disabled = true;
-    
-    // Simulate registration delay
-    setTimeout(() => {
-      const success = handleRegister(name, email, password);
-      
-      // Reset button
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-      
-      if (success) {
-        // Clear form
-        registerForm.reset();
-      }
-    }, 1000);
-  });
-}
-
-// Handle login logic
-function handleLogin(email, password, rememberMe = false) {
-  const users = getUsers();
-  const user = users.find(u => 
-    u.email.toLowerCase() === email.toLowerCase() && 
-    u.password === password
-  );
-  
-  if (user) {
-    // Set current user
-    const userData = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role || 'user'
-    };
-    
-    setCurrentUser(userData);
-    
-    // Store remember me preference
-    if (rememberMe) {
-      localStorage.setItem('luxora_remember_me', 'true');
-    }
-    
-    showNotification(`Welcome back, ${user.name}!`, 'success');
-    
-    // Redirect based on role
-    setTimeout(() => {
-      if (user.role === 'admin') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'index.html';
-      }
-    }, 1500);
-    
-    return true;
-  } else {
-    showNotification('Invalid email or password. Please try again.', 'error');
-    return false;
-  }
-}
-
-// Handle registration logic
-function handleRegister(name, email, password) {
-  try {
-    const newUser = {
-      name: name,
-      email: email,
-      password: password, // In production, this should be hashed
-      role: 'user',
-      createdAt: new Date().toISOString()
-    };
-    
-    const success = addUser(newUser);
-    
-    if (success) {
-      showNotification('Account created successfully! Please sign in.', 'success');
-      
-      // Switch to login form
+      // Fade in login form
       setTimeout(() => {
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        switchToLoginForm(loginForm, registerForm);
-        
-        // Pre-fill email in login form
-        const emailInput = document.getElementById('email');
-        if (emailInput) {
-          emailInput.value = email;
-        }
-      }, 1500);
-      
-      return true;
-    } else {
-      showNotification('Failed to create account. Please try again.', 'error');
-      return false;
+        loginForm.style.opacity = '1';
+        loginForm.style.transform = 'translateX(0)';
+      }, 50);
+    }, 300);
+
+    // Update header
+    formTitle.textContent = 'Welcome Back';
+    formSubtitle.textContent = 'Sign in to your LUXORA account';
+    switchFormText.innerHTML = 'Don\'t have an account? <a href="#" id="register-link">Create one</a>';
+  }
+
+  // Use event delegation for dynamic links
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('#register-link, #register-link *')) {
+      e.preventDefault();
+      switchToRegister();
     }
-  } catch (error) {
-    console.error('Registration error:', error);
-    showNotification('An error occurred during registration. Please try again.', 'error');
-    return false;
-  }
-}
 
-// Forgot password functionality
-function handleForgotPassword() {
-  const email = prompt('Please enter your email address:');
-  
-  if (!email) return;
-  
-  if (!validateEmail(email)) {
-    showNotification('Please enter a valid email address', 'error');
-    return;
-  }
-  
-  const users = getUsers();
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  
-  if (user) {
-    showNotification('Password reset instructions have been sent to your email', 'success');
-  } else {
-    showNotification('No account found with this email address', 'error');
-  }
-}
-
-// Auto-login for development/testing
-function autoLogin(email, role = 'user') {
-  const users = getUsers();
-  let user = users.find(u => u.email === email);
-  
-  if (!user) {
-    // Create user if doesn't exist
-    user = {
-      name: role === 'admin' ? 'Admin User' : 'Test User',
-      email: email,
-      password: 'test123',
-      role: role,
-      createdAt: new Date().toISOString()
-    };
-    addUser(user);
-  }
-  
-  setCurrentUser({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role
+    if (e.target.matches('#login-link, #login-link *')) {
+      e.preventDefault();
+      switchToLogin();
+    }
   });
+
+  // =============== PASSWORD TOGGLE ===============
   
-  showNotification(`Auto-logged in as ${user.name}`, 'info');
+  if (passwordToggle && passwordInput) {
+    passwordToggle.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type');
+      const icon = passwordToggle.querySelector('i');
+      
+      if (type === 'password') {
+        passwordInput.setAttribute('type', 'text');
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.setAttribute('type', 'password');
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+  }
   
-  setTimeout(() => {
-    if (user.role === 'admin') {
-      window.location.href = 'admin.html';
-    } else {
-      window.location.href = 'index.html';
+  // Register form password toggle
+  const regPasswordInput = document.getElementById('reg-password');
+  const regConfirmPasswordInput = document.getElementById('reg-confirm-password');
+  
+  if (regPasswordInput) {
+    const regPasswordToggle = document.createElement('button');
+    regPasswordToggle.type = 'button';
+    regPasswordToggle.className = 'password-toggle';
+    regPasswordToggle.innerHTML = '<i class="fas fa-eye"></i>';
+    regPasswordInput.parentElement.appendChild(regPasswordToggle);
+    
+    regPasswordToggle.addEventListener('click', function() {
+      const type = regPasswordInput.getAttribute('type');
+      const icon = regPasswordToggle.querySelector('i');
+      
+      if (type === 'password') {
+        regPasswordInput.setAttribute('type', 'text');
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        regPasswordInput.setAttribute('type', 'password');
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+  }
+
+  // =============== DEMO CREDENTIALS AUTO-FILL ===============
+
+  const demoInfo = document.querySelector('.demo-info');
+  if (demoInfo) {
+    // Make demo info clickable
+    demoInfo.style.cursor = 'pointer';
+    demoInfo.title = 'Click to auto-fill credentials';
+
+    demoInfo.addEventListener('click', function() {
+      const emailInput = document.getElementById('email');
+      const passwordInputField = document.getElementById('password');
+
+      // Auto-fill with admin credentials
+      if (emailInput && passwordInputField) {
+        emailInput.value = 'admin@luxora.com';
+        passwordInputField.value = 'admin123';
+
+        // Show feedback
+        showNotification('Demo credentials filled!', 'success');
+      }
+    });
+
+    // Add visual indicator
+    const clickHint = document.createElement('p');
+    clickHint.style.fontSize = '0.75rem';
+    clickHint.style.color = 'var(--primary-color)';
+    clickHint.style.marginTop = '0.5rem';
+    clickHint.innerHTML = '<i class="fas fa-hand-pointer"></i> Click here to auto-fill';
+    demoInfo.appendChild(clickHint);
+  }
+
+  // =============== DEMO ACCOUNT CREATION ===============
+
+  if (registerForm) {
+    // Add demo account creation button
+    const demoAccountBtn = document.createElement('button');
+    demoAccountBtn.type = 'button';
+    demoAccountBtn.className = 'btn-secondary btn-full demo-account-btn';
+    demoAccountBtn.innerHTML = '<span class="btn-text">Create Demo Account</span>';
+    demoAccountBtn.style.marginTop = '1rem';
+
+    // Insert after the main create account button
+    const createAccountBtn = registerForm.querySelector('button[type="submit"]');
+    if (createAccountBtn) {
+      createAccountBtn.parentElement.insertBefore(demoAccountBtn, createAccountBtn.nextSibling);
     }
-  }, 1000);
-}
 
-function validateField(input) {
-  const value = input.value.trim();
-  let isValid = true;
-  let message = '';
+    demoAccountBtn.addEventListener('click', function() {
+      // Auto-fill demo account data
+      const nameInput = document.getElementById('reg-name');
+      const emailInput = document.getElementById('reg-email');
+      const passwordInput = document.getElementById('reg-password');
+      const confirmPasswordInput = document.getElementById('reg-confirm-password');
+      const termsCheckbox = document.getElementById('terms-agreement');
 
-  switch (input.id) {
-    case 'email':
-      isValid = validateEmail(value);
-      message = 'Please enter a valid email address';
-      break;
-    case 'register-email':
-      isValid = validateEmail(value);
-      message = 'Please enter a valid email address';
-      break;
-    case 'password':
-    case 'register-password':
-      isValid = value.length >= 6;
-      message = 'Password must be at least 6 characters';
-      break;
-    case 'register-name':
-      isValid = value.length >= 2;
-      message = 'Name must be at least 2 characters';
-      break;
+      if (nameInput && emailInput && passwordInput && confirmPasswordInput && termsCheckbox) {
+        // Generate random demo data
+        const demoNames = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 'David Brown'];
+        const randomName = demoNames[Math.floor(Math.random() * demoNames.length)];
+        const randomEmail = `demo${Date.now()}@luxora.com`;
+
+        nameInput.value = randomName;
+        emailInput.value = randomEmail;
+        passwordInput.value = 'demo123';
+        confirmPasswordInput.value = 'demo123';
+        termsCheckbox.checked = true;
+
+        // Clear any previous validation errors
+        clearFieldValidation(nameInput);
+        clearFieldValidation(emailInput);
+        clearFieldValidation(passwordInput);
+        clearFieldValidation(confirmPasswordInput);
+
+        showNotification('Demo account data filled! Click "Create Account" to proceed.', 'info');
+      }
+    });
   }
 
-  if (!isValid) {
-    showFieldError(input, message);
-  } else {
-    clearFieldError(input);
+  // =============== FORM VALIDATION ===============
+  
+  function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   }
-}
-
-function showFieldError(input, message) {
-  clearFieldError(input);
-  input.classList.add('error');
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'field-error';
-  errorDiv.textContent = message;
-  input.parentNode.appendChild(errorDiv);
-}
-
-function clearFieldError(input) {
-  const existingError = input.parentNode.querySelector('.field-error');
-  if (existingError) {
-    existingError.remove();
+  
+  function validatePassword(password) {
+    return password.length >= 6;
   }
-  input.classList.remove('error');
+  
+  function showFieldError(input, message) {
+    const formGroup = input.closest('.form-group');
+    formGroup.classList.add('error');
+    formGroup.classList.remove('success');
+    
+    // Remove existing error message
+    const existingError = formGroup.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+    
+    // Add error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    input.parentElement.after(errorDiv);
+  }
+  
+  function showFieldSuccess(input) {
+    const formGroup = input.closest('.form-group');
+    formGroup.classList.remove('error');
+    formGroup.classList.add('success');
+    
+    // Remove error message
+    const existingError = formGroup.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+  }
+  
+  function clearFieldValidation(input) {
+    const formGroup = input.closest('.form-group');
+    formGroup.classList.remove('error', 'success');
+    
+    const existingError = formGroup.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+  }
+
+  // Real-time validation for login form
+  if (loginForm) {
+    const emailInput = document.getElementById('email');
+    const passwordInputField = document.getElementById('password');
+    
+    if (emailInput) {
+      emailInput.addEventListener('blur', function() {
+        if (!this.value) {
+          showFieldError(this, 'Email is required');
+        } else if (!validateEmail(this.value)) {
+          showFieldError(this, 'Please enter a valid email');
+        } else {
+          showFieldSuccess(this);
+        }
+      });
+      
+      emailInput.addEventListener('input', function() {
+        if (this.value && validateEmail(this.value)) {
+          showFieldSuccess(this);
+        }
+      });
+    }
+    
+    if (passwordInputField) {
+      passwordInputField.addEventListener('blur', function() {
+        if (!this.value) {
+          showFieldError(this, 'Password is required');
+        } else if (!validatePassword(this.value)) {
+          showFieldError(this, 'Password must be at least 6 characters');
+        } else {
+          showFieldSuccess(this);
+        }
+      });
+    }
+  }
+
+  // Real-time validation for register form
+  if (registerForm) {
+    const regEmailInput = document.getElementById('reg-email');
+    const regPasswordInputField = document.getElementById('reg-password');
+    const regConfirmPasswordInputField = document.getElementById('reg-confirm-password');
+    const termsCheckbox = document.getElementById('terms-agreement');
+    
+    if (regEmailInput) {
+      regEmailInput.addEventListener('blur', function() {
+        if (!this.value) {
+          showFieldError(this, 'Email is required');
+        } else if (!validateEmail(this.value)) {
+          showFieldError(this, 'Please enter a valid email');
+        } else {
+          showFieldSuccess(this);
+        }
+      });
+    }
+    
+    if (regPasswordInputField) {
+      regPasswordInputField.addEventListener('blur', function() {
+        if (!this.value) {
+          showFieldError(this, 'Password is required');
+        } else if (!validatePassword(this.value)) {
+          showFieldError(this, 'Password must be at least 6 characters');
+        } else {
+          showFieldSuccess(this);
+        }
+      });
+    }
+    
+    if (regConfirmPasswordInputField && regPasswordInputField) {
+      regConfirmPasswordInputField.addEventListener('blur', function() {
+        if (!this.value) {
+          showFieldError(this, 'Please confirm your password');
+        } else if (this.value !== regPasswordInputField.value) {
+          showFieldError(this, 'Passwords do not match');
+        } else {
+          showFieldSuccess(this);
+        }
+      });
+      
+      regPasswordInputField.addEventListener('input', function() {
+        if (regConfirmPasswordInputField.value) {
+          if (this.value === regConfirmPasswordInputField.value) {
+            showFieldSuccess(regConfirmPasswordInputField);
+          } else {
+            showFieldError(regConfirmPasswordInputField, 'Passwords do not match');
+          }
+        }
+      });
+    }
+  }
+
+  // =============== LOGIN FORM SUBMISSION ===============
+  
+  if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const emailInput = document.getElementById('email');
+      const passwordInputField = document.getElementById('password');
+      const rememberMe = document.getElementById('remember-me');
+      
+      // Validate
+      let isValid = true;
+      
+      if (!emailInput.value) {
+        showFieldError(emailInput, 'Email is required');
+        isValid = false;
+      } else if (!validateEmail(emailInput.value)) {
+        showFieldError(emailInput, 'Please enter a valid email');
+        isValid = false;
+      }
+      
+      if (!passwordInputField.value) {
+        showFieldError(passwordInputField, 'Password is required');
+        isValid = false;
+      }
+      
+      if (!isValid) return;
+      
+      // Show loading state
+      const submitBtn = loginForm.querySelector('button[type="submit"]');
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnLoading = submitBtn.querySelector('.btn-loading');
+      
+      btnText.style.display = 'none';
+      btnLoading.style.display = 'inline-block';
+      submitBtn.disabled = true;
+      
+      // Simulate login (replace with actual API call)
+      setTimeout(() => {
+        const email = emailInput.value.toLowerCase();
+        
+        // Check credentials
+        let user = null;
+        if (email === 'admin@luxora.com') {
+          user = { email, role: 'admin', name: 'Admin User' };
+        } else if (email === 'user@luxora.com') {
+          user = { email, role: 'user', name: 'Regular User' };
+        } else {
+          user = { email, role: 'user', name: email.split('@')[0] };
+        }
+        
+        // Store user data
+        setCurrentUser(user);
+        
+        // Handle remember me
+        if (rememberMe && rememberMe.checked) {
+          localStorage.setItem('rememberMe', 'true');
+          localStorage.setItem('savedEmail', email);
+        }
+        
+        showNotification('Login successful! Redirecting...', 'success');
+        
+        // Redirect after short delay
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+      }, 1500);
+    });
+  }
+
+  // =============== REGISTER FORM SUBMISSION ===============
+
+  if (registerForm) {
+    const createAccountBtn = registerForm.querySelector('button[type="submit"]');
+    if (createAccountBtn) {
+      registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Use native HTML5 validation first
+        if (!registerForm.checkValidity()) {
+          registerForm.reportValidity();
+          return;
+        }
+
+        const nameInput = document.getElementById('reg-name');
+        const emailInput = document.getElementById('reg-email');
+        const passwordInputField = document.getElementById('reg-password');
+        const confirmPasswordInput = document.getElementById('reg-confirm-password');
+        const termsCheckbox = document.getElementById('terms-agreement');
+
+        // Clear previous errors
+        if (nameInput) clearFieldValidation(nameInput);
+        if (emailInput) clearFieldValidation(emailInput);
+        if (passwordInputField) clearFieldValidation(passwordInputField);
+        if (confirmPasswordInput) clearFieldValidation(confirmPasswordInput);
+
+        // Validate
+        let isValid = true;
+
+        if (!nameInput) {
+          showNotification('Form error: Name field not found', 'error');
+          return;
+        }
+        if (!nameInput.value.trim()) {
+          showFieldError(nameInput, 'Name is required');
+          isValid = false;
+        }
+
+        if (!emailInput) {
+          showNotification('Form error: Email field not found', 'error');
+          return;
+        }
+        if (!emailInput.value.trim()) {
+          showFieldError(emailInput, 'Email is required');
+          isValid = false;
+        } else if (!validateEmail(emailInput.value.trim())) {
+          showFieldError(emailInput, 'Please enter a valid email');
+          isValid = false;
+        }
+
+        if (!passwordInputField) {
+          showNotification('Form error: Password field not found', 'error');
+          return;
+        }
+        if (!passwordInputField.value.trim()) {
+          showFieldError(passwordInputField, 'Password is required');
+          isValid = false;
+        } else if (!validatePassword(passwordInputField.value.trim())) {
+          showFieldError(passwordInputField, 'Password must be at least 6 characters');
+          isValid = false;
+        }
+
+        if (!confirmPasswordInput) {
+          showNotification('Form error: Confirm password field not found', 'error');
+          return;
+        }
+        if (!confirmPasswordInput.value.trim()) {
+          showFieldError(confirmPasswordInput, 'Please confirm your password');
+          isValid = false;
+        } else if (confirmPasswordInput.value.trim() !== passwordInputField.value.trim()) {
+          showFieldError(confirmPasswordInput, 'Passwords do not match');
+          isValid = false;
+        }
+
+        if (!termsCheckbox) {
+          showNotification('Form error: Terms checkbox not found', 'error');
+          return;
+        }
+        if (!termsCheckbox.checked) {
+          showNotification('Please agree to the Terms of Service', 'error');
+          isValid = false;
+        }
+
+        if (!isValid) {
+          showNotification('Please fill in all required fields correctly', 'error');
+          return;
+        }
+
+        // Show loading state
+        const btnText = createAccountBtn.querySelector('.btn-text');
+        const btnLoading = createAccountBtn.querySelector('.btn-loading');
+
+        if (btnText && btnLoading) {
+          btnText.style.display = 'none';
+          btnLoading.style.display = 'inline-block';
+          createAccountBtn.disabled = true;
+        }
+
+        // Simulate registration (replace with actual API call)
+        setTimeout(() => {
+          const plainPassword = passwordInputField.value.trim();
+          const newUserData = {
+            name: nameInput.value.trim(),
+            email: emailInput.value.toLowerCase().trim(),
+            password: plainPassword,
+          };
+
+          // Persist the user in the users list for admin metrics
+          if (typeof addUser === 'function') {
+            const added = addUser(newUserData);
+            if (!added) {
+              showNotification('An account with this email already exists.', 'error');
+              if (createAccountBtn) {
+                const btnText = createAccountBtn.querySelector('.btn-text');
+                const btnLoading = createAccountBtn.querySelector('.btn-loading');
+                if (btnText && btnLoading) {
+                  btnText.style.display = 'inline-block';
+                  btnLoading.style.display = 'none';
+                  createAccountBtn.disabled = false;
+                }
+              }
+              return;
+            }
+          }
+
+          // Set current session user without storing password
+          const user = {
+            name: newUserData.name,
+            email: newUserData.email,
+            role: 'user'
+          };
+          setCurrentUser(user);
+
+          showNotification('Account created successfully! Redirecting...', 'success');
+
+          // Redirect after short delay
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1000);
+        }, 1500);
+      });
+    }
+  }
+
+  // =============== REMEMBER ME - AUTO-FILL ===============
+  
+  const rememberMeChecked = localStorage.getItem('rememberMe');
+  const savedEmail = localStorage.getItem('savedEmail');
+  
+  if (rememberMeChecked === 'true' && savedEmail) {
+    const emailInput = document.getElementById('email');
+    const rememberMeCheckbox = document.getElementById('remember-me');
+    
+    if (emailInput) {
+      emailInput.value = savedEmail;
+    }
+    
+    if (rememberMeCheckbox) {
+      rememberMeCheckbox.checked = true;
+    }
+  }
+
+  // =============== SOCIAL LOGIN (PLACEHOLDER) ===============
+  
+  const socialButtons = document.querySelectorAll('.social-btn');
+  socialButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const provider = this.getAttribute('data-provider');
+      showNotification(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login coming soon!`, 'info');
+    });
+  });
+
+  // =============== FORGOT PASSWORD (PLACEHOLDER) ===============
+  
+  const forgotPasswordLink = document.querySelector('.forgot-password');
+  if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showNotification('Password reset feature coming soon! Please contact support.', 'info');
+    });
+  }
+});
+
+// =============== NOTIFICATION HELPER ===============
+
+function showNotification(message, type = 'info') {
+  // Remove existing notifications
+  const existing = document.querySelector('.notification');
+  if (existing) {
+    existing.remove();
+  }
+  
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-exclamation-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  notification.innerHTML = `
+    <div class="notification-content">
+      <i class="fas ${icons[type]}"></i>
+      <span class="notification-message">${message}</span>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease forwards';
+    setTimeout(() => notification.remove(), 300);
+  }, 5000);
 }
-
-
-
-// Development helper functions
-window.devLogin = {
-  admin: () => autoLogin('admin@luxora.com', 'admin'),
-  user: () => autoLogin('user@luxora.com', 'user')
-};
-
-// Make functions globally available
-window.handleForgotPassword = handleForgotPassword;
-window.autoLogin = autoLogin;

@@ -1,8 +1,10 @@
 /* =============== ADMIN DASHBOARD STYLES =============== */
+/* Uses CSS variables from style.css */
+/* REMOVED DUPLICATE @keyframes fadeIn and slideUp */
 
 .admin-badge {
-  background: linear-gradient(135deg, #FF6B35 0%, #e55a2e 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: var(--text-white);
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -12,17 +14,17 @@
 
 .admin-container {
   display: flex;
-  min-height: calc(100vh - 80px);
-  background-color: #f5f7fa;
+  min-height: calc(100vh - var(--header-height));
+  background-color: var(--bg-secondary);
 }
 
 .admin-sidebar {
   width: 280px;
-  background: white;
+  background: var(--bg-primary);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   position: sticky;
-  top: 80px;
-  height: calc(100vh - 80px);
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
   overflow-y: auto;
 }
 
@@ -37,7 +39,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 2rem;
-  color: #666;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
@@ -45,15 +47,15 @@
 }
 
 .nav-item:hover {
-  background-color: #f8f9fa;
-  color: #333;
-  border-left-color: #e1e5e9;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-left-color: var(--border-color);
 }
 
 .nav-item.active {
   background-color: #fff5f0;
-  color: #FF6B35;
-  border-left-color: #FF6B35;
+  color: var(--primary-color);
+  border-left-color: var(--primary-color);
   font-weight: 600;
 }
 
@@ -75,7 +77,7 @@
 
 .admin-section.active {
   display: block;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.3s ease; /* Using fadeIn from style.css */
 }
 
 .section-header {
@@ -88,7 +90,7 @@
 }
 
 .section-header h1 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
@@ -98,7 +100,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -112,10 +114,10 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -124,12 +126,12 @@
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-large);
 }
 
 .stat-icon {
-  background: linear-gradient(135deg, #FF6B35 0%, #e55a2e 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: var(--text-white);
   width: 60px;
   height: 60px;
   border-radius: 16px;
@@ -144,7 +146,7 @@
 }
 
 .stat-info h3 {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -153,7 +155,7 @@
 }
 
 .stat-value {
-  color: #333;
+  color: var(--text-primary);
   font-size: 2rem;
   font-weight: 700;
   margin: 0.5rem 0;
@@ -168,18 +170,18 @@
 }
 
 .stat-change.positive {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-light);
+  color: var(--success);
 }
 
 .stat-change.negative {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--danger-light);
+  color: var(--danger);
 }
 
 .stat-change.neutral {
-  background: #e1e5e9;
-  color: #6c757d;
+  background: var(--hover-color);
+  color: var(--text-secondary);
 }
 
 /* =============== DASHBOARD CHARTS =============== */
@@ -192,14 +194,14 @@
 }
 
 .chart-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
 }
 
 .chart-card h3 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -215,25 +217,25 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 10px;
   transition: all 0.3s ease;
 }
 
 .order-item:hover {
-  background: #e9ecef;
+  background: var(--hover-color);
   transform: translateX(5px);
 }
 
 .order-info strong {
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
   display: block;
   margin-bottom: 0.25rem;
 }
 
 .order-info span {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -251,8 +253,8 @@
 }
 
 .status.delivered {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-light);
+  color: var(--success);
 }
 
 .status.pending {
@@ -267,7 +269,7 @@
 
 .amount {
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .quick-actions {
@@ -276,9 +278,9 @@
 }
 
 .action-btn {
-  background: white;
-  border: 2px solid #e1e5e9;
-  color: #666;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  color: var(--text-secondary);
   padding: 1rem;
   border-radius: 10px;
   cursor: pointer;
@@ -290,8 +292,8 @@
 }
 
 .action-btn:hover {
-  border-color: #FF6B35;
-  color: #FF6B35;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
   background: #fff5f0;
   transform: translateY(-2px);
 }
@@ -323,18 +325,18 @@
 .filter-controls select {
   min-width: 150px;
   padding: 0.5rem;
-  border: 2px solid #e1e5e9;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
-  background: white;
+  background: var(--bg-primary);
   margin-bottom: 0;
 }
 
 .products-table,
 .orders-table,
 .users-table {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
   overflow: hidden;
 }
 
@@ -348,12 +350,12 @@
 .products-table th,
 .orders-table th,
 .users-table th {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #333;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--hover-color) 100%);
+  color: var(--text-primary);
   font-weight: 700;
   padding: 1rem;
   text-align: left;
-  border-bottom: 2px solid #e1e5e9;
+  border-bottom: 2px solid var(--border-color);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -363,14 +365,14 @@
 .orders-table td,
 .users-table td {
   padding: 1rem;
-  border-bottom: 1px solid #e1e5e9;
+  border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
 
 .products-table tr:hover,
 .orders-table tr:hover,
 .users-table tr:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
 }
 
 .product-image-cell {
@@ -388,7 +390,7 @@
 
 .product-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
@@ -396,7 +398,7 @@
 }
 
 .product-category {
-  background: #e9ecef;
+  background: var(--hover-color);
   color: #495057;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
@@ -407,7 +409,7 @@
 
 .product-price {
   font-weight: 700;
-  color: #FF6B35;
+  color: var(--primary-color);
 }
 
 .product-stock {
@@ -415,7 +417,7 @@
 }
 
 .product-stock.low {
-  color: #dc3545;
+  color: var(--danger);
 }
 
 .product-stock.medium {
@@ -423,7 +425,7 @@
 }
 
 .product-stock.high {
-  color: #28a745;
+  color: var(--success);
 }
 
 .product-status {
@@ -435,13 +437,13 @@
 }
 
 .product-status.active {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-light);
+  color: var(--success);
 }
 
 .product-status.inactive {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--danger-light);
+  color: var(--danger);
 }
 
 .product-status.out-of-stock {
@@ -482,7 +484,7 @@
 }
 
 .order-stats .stat.delivered {
-  color: #155724;
+  color: var(--success);
 }
 
 /* =============== ANALYTICS =============== */
@@ -494,25 +496,25 @@
 }
 
 .analytics-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
   text-align: center;
 }
 
 .analytics-card h3 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 2rem;
 }
 
 .chart-placeholder {
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 3rem 2rem;
-  color: #666;
+  color: var(--text-secondary);
   min-height: 200px;
   display: flex;
   flex-direction: column;
@@ -522,7 +524,7 @@
 
 .chart-placeholder i {
   font-size: 3rem;
-  color: #ccc;
+  color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
@@ -540,14 +542,14 @@
 }
 
 .settings-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
 }
 
 .settings-card h3 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -559,7 +561,7 @@
 
 .settings-card label {
   display: block;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -587,8 +589,8 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  z-index: var(--z-modal-backdrop); /* Updated: 1200 */
+  animation: fadeIn 0.3s ease; /* Using fadeIn from style.css */
 }
 
 .modal.active {
@@ -599,14 +601,14 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xlarge);
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideUp 0.3s ease;
+  animation: slideUp 0.3s ease; /* Using slideUp from style.css */
 }
 
 .modal-header {
@@ -614,11 +616,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem 2rem 1rem 2rem;
-  border-bottom: 1px solid #e1e5e9;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .modal-header h2 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
@@ -628,7 +630,7 @@
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #666;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -641,8 +643,8 @@
 }
 
 .close-btn:hover {
-  background: #f8f9fa;
-  color: #333;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .modal form {
@@ -655,7 +657,7 @@
   justify-content: flex-end;
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid #e1e5e9;
+  border-top: 1px solid var(--border-color);
 }
 
 /* =============== RESPONSIVE DESIGN =============== */
@@ -686,7 +688,7 @@
 
   .nav-item.active {
     border-left: none;
-    border-bottom-color: #FF6B35;
+    border-bottom-color: var(--primary-color);
   }
 
   .admin-content {
@@ -798,25 +800,25 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .admin-container {
-    background-color: #1a1a1a;
+    background-color: var(--dark-bg-primary);
   }
 
   .admin-sidebar {
-    background: #2d2d2d;
+    background: var(--dark-bg-secondary);
   }
 
   .nav-item {
-    color: #b0b0b0;
+    color: var(--dark-text-secondary);
   }
 
   .nav-item:hover {
-    background-color: #3d3d3d;
-    color: #e0e0e0;
+    background-color: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
   }
 
   .nav-item.active {
     background-color: #2d1810;
-    color: #FF6B35;
+    color: var(--primary-color);
   }
 
   .stat-card,
@@ -826,16 +828,16 @@
   .users-table,
   .settings-card,
   .analytics-card {
-    background: #2d2d2d;
-    color: #e0e0e0;
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text-primary);
   }
 
   .section-header h1 {
-    color: #e0e0e0;
+    color: var(--dark-text-primary);
   }
 
   .modal-content {
-    background: #2d2d2d;
-    color: #e0e0e0;
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text-primary);
   }
 }

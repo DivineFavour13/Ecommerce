@@ -1,6 +1,5 @@
-// common.js - Common utility functions and shared functionality
+// common.js - FIXED with all duplicates removed
 
-// Initialize common functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   initCommon();
 });
@@ -14,14 +13,13 @@ function initCommon() {
   initializeNotifications();
 }
 
-// Cart count update
+// ==================== CART COUNT ====================
 function updateCartCount() {
   const cartCountElement = document.getElementById('cart-count');
   if (cartCountElement) {
     const count = getCartItemCount();
     cartCountElement.textContent = count;
     
-    // Add animation when count changes
     if (count > 0) {
       cartCountElement.parentElement.classList.add('has-items');
     } else {
@@ -30,7 +28,7 @@ function updateCartCount() {
   }
 }
 
-// Auth link update based on user status
+// ==================== AUTH LINK ====================
 function updateAuthLink() {
   const authLink = document.getElementById('auth-link');
   const authText = document.getElementById('auth-text');
@@ -42,7 +40,6 @@ function updateAuthLink() {
       authText.textContent = user.name || 'Account';
       authLink.href = user.role === 'admin' ? 'admin.html' : '#';
       
-      // Add dropdown menu for logged-in users
       if (!authLink.querySelector('.user-dropdown')) {
         createUserDropdown(authLink, user);
       }
@@ -50,7 +47,6 @@ function updateAuthLink() {
       authText.textContent = 'Login';
       authLink.href = 'login.html';
       
-      // Remove dropdown if exists
       const dropdown = authLink.querySelector('.user-dropdown');
       if (dropdown) {
         dropdown.remove();
@@ -59,7 +55,7 @@ function updateAuthLink() {
   }
 }
 
-// Create user dropdown menu
+// ==================== USER DROPDOWN ====================
 function createUserDropdown(authLink, user) {
   const dropdown = document.createElement('div');
   dropdown.className = 'user-dropdown';
@@ -76,20 +72,17 @@ function createUserDropdown(authLink, user) {
   
   authLink.appendChild(dropdown);
   
-  // Toggle dropdown on click
   authLink.addEventListener('click', (e) => {
     e.preventDefault();
     dropdown.classList.toggle('active');
   });
   
-  // Close dropdown when clicking outside
   document.addEventListener('click', (e) => {
     if (!authLink.contains(e.target)) {
       dropdown.classList.remove('active');
     }
   });
   
-  // Handle logout
   const logoutLink = dropdown.querySelector('#logout-link');
   if (logoutLink) {
     logoutLink.addEventListener('click', (e) => {
@@ -99,37 +92,33 @@ function createUserDropdown(authLink, user) {
   }
 }
 
-// Handle user logout
+// ==================== LOGOUT ====================
 function handleLogout() {
   if (confirm('Are you sure you want to logout?')) {
     logout();
-    clearCart(); // Optional: clear cart on logout
+    clearCart();
     showNotification('You have been logged out successfully', 'success');
     
-    // Redirect to home page after a short delay
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 1000);
   }
 }
 
-// Search functionality
+// ==================== SEARCH ====================
 function setupSearchFunctionality() {
   const searchInput = document.getElementById('search-input');
   const searchBtn = document.getElementById('search-btn');
   
   if (searchInput && searchBtn) {
-    // Handle search button click
     searchBtn.addEventListener('click', performSearch);
     
-    // Handle enter key press
     searchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         performSearch();
       }
     });
     
-    // Add search suggestions (debounced)
     let searchTimeout;
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
@@ -140,26 +129,21 @@ function setupSearchFunctionality() {
   }
 }
 
-// Perform search
 function performSearch() {
   const searchInput = document.getElementById('search-input');
   const query = searchInput?.value.trim();
   
   if (query) {
-    // Store search query for results page
     localStorage.setItem('searchQuery', query);
     
-    // If we're on home page, filter products
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
       filterProductsBySearch(query);
     } else {
-      // Redirect to search results page
       window.location.href = `index.html?search=${encodeURIComponent(query)}`;
     }
   }
 }
 
-// Filter products by search query
 function filterProductsBySearch(query) {
   const products = getProducts();
   const filteredProducts = products.filter(product => 
@@ -168,7 +152,6 @@ function filterProductsBySearch(query) {
     product.category.toLowerCase().includes(query.toLowerCase())
   );
   
-  // Update product grids with filtered results
   const grids = document.querySelectorAll('.product-grid');
   grids.forEach(grid => {
     if (grid) {
@@ -176,11 +159,9 @@ function filterProductsBySearch(query) {
     }
   });
   
-  // Show search result message
   showSearchResultMessage(query, filteredProducts.length);
 }
 
-// Show search suggestions
 function showSearchSuggestions(query) {
   if (query.length < 2) return;
   
@@ -192,7 +173,6 @@ function showSearchSuggestions(query) {
     .slice(0, 5)
     .map(product => product.name);
   
-  // Create or update suggestions dropdown
   let suggestionsEl = document.getElementById('search-suggestions');
   if (!suggestionsEl) {
     suggestionsEl = document.createElement('div');
@@ -208,7 +188,6 @@ function showSearchSuggestions(query) {
     
     suggestionsEl.style.display = 'block';
     
-    // Handle suggestion clicks
     suggestionsEl.querySelectorAll('.suggestion-item').forEach(item => {
       item.addEventListener('click', () => {
         document.getElementById('search-input').value = item.textContent;
@@ -221,7 +200,7 @@ function showSearchSuggestions(query) {
   }
 }
 
-// Newsletter form setup
+// ==================== NEWSLETTER ====================
 function setupNewsletterForm() {
   const newsletterForms = document.querySelectorAll('#newsletter-form, .footer-newsletter');
   
@@ -233,13 +212,8 @@ function setupNewsletterForm() {
       const email = emailInput?.value.trim();
       
       if (email && isValidEmail(email)) {
-        // Simulate newsletter subscription
         subscribeToNewsletter(email);
-        
-        // Show success message
         showNotification('Thank you for subscribing to our newsletter!', 'success');
-        
-        // Clear form
         emailInput.value = '';
       } else {
         showNotification('Please enter a valid email address', 'error');
@@ -248,12 +222,9 @@ function setupNewsletterForm() {
   });
 }
 
-// Newsletter subscription
 function subscribeToNewsletter(email) {
-  // Get existing subscribers
   let subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
   
-  // Check if already subscribed
   if (!subscribers.includes(email)) {
     subscribers.push(email);
     localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
@@ -262,15 +233,8 @@ function subscribeToNewsletter(email) {
   return true;
 }
 
-// Email validation
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// Mobile menu setup
+// ==================== MOBILE MENU ====================
 function setupMobileMenu() {
-  // This would be for a mobile hamburger menu if needed
   const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
   const mobileMenu = document.querySelector('.mobile-menu');
   
@@ -282,9 +246,8 @@ function setupMobileMenu() {
   }
 }
 
-// Notification system
+// ==================== NOTIFICATIONS ====================
 function initializeNotifications() {
-  // Create notification container if it doesn't exist
   if (!document.getElementById('notification-container')) {
     const container = document.createElement('div');
     container.id = 'notification-container';
@@ -293,7 +256,6 @@ function initializeNotifications() {
   }
 }
 
-// Show notification
 function showNotification(message, type = 'info', duration = 5000) {
   const container = document.getElementById('notification-container');
   if (!container) return;
@@ -310,18 +272,14 @@ function showNotification(message, type = 'info', duration = 5000) {
     <button class="notification-close">&times;</button>
   `;
   
-  // Add to container
   container.appendChild(notification);
   
-  // Animate in
   setTimeout(() => notification.classList.add('show'), 100);
   
-  // Auto remove
   const autoRemove = setTimeout(() => {
     removeNotification(notification);
   }, duration);
   
-  // Manual close
   const closeBtn = notification.querySelector('.notification-close');
   closeBtn.addEventListener('click', () => {
     clearTimeout(autoRemove);
@@ -329,7 +287,6 @@ function showNotification(message, type = 'info', duration = 5000) {
   });
 }
 
-// Remove notification
 function removeNotification(notification) {
   notification.classList.add('hide');
   setTimeout(() => {
@@ -339,7 +296,6 @@ function removeNotification(notification) {
   }, 300);
 }
 
-// Get notification icon
 function getNotificationIcon(type) {
   const icons = {
     success: 'fas fa-check-circle',
@@ -350,12 +306,11 @@ function getNotificationIcon(type) {
   return icons[type] || icons.info;
 }
 
-// Format currency
+// ==================== UTILITIES ====================
 function formatCurrency(amount, currency = '₦') {
   return `${currency}${amount.toLocaleString()}`;
 }
 
-// Format date
 function formatDate(dateString, options = {}) {
   const defaultOptions = {
     year: 'numeric',
@@ -367,7 +322,11 @@ function formatDate(dateString, options = {}) {
   return new Date(dateString).toLocaleDateString('en-US', formatOptions);
 }
 
-// Debounce function
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -380,7 +339,6 @@ function debounce(func, wait) {
   };
 }
 
-// Throttle function
 function throttle(func, limit) {
   let inThrottle;
   return function() {
@@ -394,7 +352,6 @@ function throttle(func, limit) {
   };
 }
 
-// Smooth scroll to element
 function scrollToElement(elementId, offset = 0) {
   const element = document.getElementById(elementId);
   if (element) {
@@ -408,7 +365,6 @@ function scrollToElement(elementId, offset = 0) {
   }
 }
 
-// Check if element is in viewport
 function isInViewport(element) {
   const rect = element.getBoundingClientRect();
   return (
@@ -419,7 +375,6 @@ function isInViewport(element) {
   );
 }
 
-// Lazy load images
 function setupLazyLoading() {
   const images = document.querySelectorAll('img[data-src]');
   
@@ -437,7 +392,6 @@ function setupLazyLoading() {
   images.forEach(img => imageObserver.observe(img));
 }
 
-// Generate random ID
 function generateRandomId(length = 8) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -447,14 +401,12 @@ function generateRandomId(length = 8) {
   return result;
 }
 
-// Copy to clipboard
 function copyToClipboard(text) {
   if (navigator.clipboard) {
     return navigator.clipboard.writeText(text).then(() => {
       showNotification('Copied to clipboard!', 'success');
     });
   } else {
-    // Fallback for older browsers
     const textArea = document.createElement('textarea');
     textArea.value = text;
     document.body.appendChild(textArea);
@@ -472,26 +424,20 @@ function copyToClipboard(text) {
   }
 }
 
-// Handle page visibility change
 function handleVisibilityChange() {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       // Page is hidden
-      console.log('Page hidden');
     } else {
-      // Page is visible
-      console.log('Page visible');
-      // Refresh cart count and auth status
+      // Page is visible - refresh cart count and auth status
       updateCartCount();
       updateAuthLink();
     }
   });
 }
 
-// Initialize page visibility handling
 handleVisibilityChange();
 
-// Handle URL parameters
 function getUrlParameters() {
   const params = new URLSearchParams(window.location.search);
   const result = {};
@@ -501,7 +447,6 @@ function getUrlParameters() {
   return result;
 }
 
-// Update URL without page reload
 function updateUrl(params) {
   const url = new URL(window.location);
   Object.keys(params).forEach(key => {
@@ -513,188 +458,26 @@ function updateUrl(params) {
   });
   window.history.pushState({}, '', url);
 }
-
-// Initialize common functionality on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initCommon);
-} else {
-  initCommon();
-}
-
-function getCurrentUser() {
-  const userStr = localStorage.getItem('luxora_current_user');
-  return userStr ? JSON.parse(userStr) : null;
-}
-
-function setCurrentUser(user) {
-  localStorage.setItem('luxora_current_user', JSON.stringify(user));
-}
-
-function getCart() {
-  const cartStr = localStorage.getItem('luxora_cart');
-  return cartStr ? JSON.parse(cartStr) : [];
-}
-
-function showNotification(message, type = 'info') {
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
-  notification.innerHTML = `
-    <div class="notification-content">
-      <i class="fas fa-${getNotificationIcon(type)}"></i>
-      <span>${message}</span>
-    </div>
-  `;
-  
-  // Add to page
-  document.body.appendChild(notification);
-  
-  // Auto remove after 3 seconds
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
-}
-
-function getNotificationIcon(type) {
-  switch (type) {
-    case 'success': return 'check-circle';
-    case 'error': return 'exclamation-circle';
-    case 'warning': return 'exclamation-triangle';
-    default: return 'info-circle';
-  }
-}
-
-// common.js - Enhanced with image handling
-
-// Image handling utilities
 function handleImageError(img) {
-  img.src = 'https://via.placeholder.com/300x300?text=No+Image';
+  const width = img.width || 300;
+  const height = img.height || 300;
+  img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3Crect fill='%23f0f0f0' width='${width}' height='${height}'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='12' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E`;
   img.alt = 'Image not available';
 }
 
-// Add error handling to all product images
 function setupImageErrorHandling() {
   document.addEventListener('DOMContentLoaded', () => {
-    const images = document.querySelectorAll('img[src*="unsplash"], img[src*="placeholder"]');
+    // Attach error handler to all images (more robust)
+    const images = document.querySelectorAll('img');
     images.forEach(img => {
       img.addEventListener('error', () => handleImageError(img));
     });
   });
 }
 
-// Initialize image error handling
 setupImageErrorHandling();
 
-// Enhanced notification function
-function showNotification(message, type = 'info') {
-  // Remove existing notifications
-  const existingNotifications = document.querySelectorAll('.notification');
-  existingNotifications.forEach(notification => {
-    notification.classList.add('slide-out');
-    setTimeout(() => notification.remove(), 300);
-  });
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
-  notification.innerHTML = `
-    <div class="notification-content">
-      <i class="fas fa-${getNotificationIcon(type)}"></i>
-      <span>${message}</span>
-    </div>
-  `;
-  
-  // Add to page
-  document.body.appendChild(notification);
-  
-  // Auto remove after 3 seconds
-  setTimeout(() => {
-    notification.classList.add('slide-out');
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
-}
-
-function getNotificationIcon(type) {
-  switch (type) {
-    case 'success': return 'check-circle';
-    case 'error': return 'exclamation-circle';
-    case 'warning': return 'exclamation-triangle';
-    default: return 'info-circle';
-  }
-}
-
-// Enhanced utility functions
-function getCurrentUser() {
-  const userStr = localStorage.getItem('luxora_current_user');
-  return userStr ? JSON.parse(userStr) : null;
-}
-
-function setCurrentUser(user) {
-  localStorage.setItem('luxora_current_user', JSON.stringify(user));
-}
-
-function getCart() {
-  const cartStr = localStorage.getItem('luxora_cart');
-  return cartStr ? JSON.parse(cartStr) : [];
-}
-
-function saveCart(cart) {
-  localStorage.setItem('luxora_cart', JSON.stringify(cart));
-}
-
-function getWishlist() {
-  const wishlistStr = localStorage.getItem('luxora_wishlist');
-  return wishlistStr ? JSON.parse(wishlistStr) : [];
-}
-
-function saveWishlist(wishlist) {
-  localStorage.setItem('luxora_wishlist', JSON.stringify(wishlist));
-}
-
-// Product utility functions
-function findProductById(id) {
-  return products.find(product => product.id === parseInt(id));
-}
-
-function formatPrice(price) {
-  return new Intl.NumberFormat('en-NG').format(price);
-}
-
-function formatCategory(category) {
-  const categoryMap = {
-    'electronics': 'Electronics',
-    'fashion': 'Fashion',
-    'home': 'Home & Living',
-    'beauty': 'Beauty',
-    'phones': 'Phones & Tablets',
-    'computing': 'Computing',
-    'gaming': 'Gaming',
-    'appliances': 'Appliances',
-    'baby': 'Baby Products',
-    'supermarket': 'Supermarket'
-  };
-  return categoryMap[category] || category;
-}
-
-// Initialize common functionality
-document.addEventListener('DOMContentLoaded', () => {
-  // Setup global error handling for images
-  setupImageErrorHandling();
-  
-  // Update cart count if element exists
-  updateCartCountIfExists();
-});
-
-function updateCartCountIfExists() {
-  const cartCountEl = document.getElementById('cart-count');
-  if (cartCountEl) {
-    const cart = getCart();
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCountEl.textContent = totalItems;
-  }
-}
-
-// Export functions for use in other modules
+// Export functions for onclick handlers (keep rest of your common.js exports)
 window.CommonUtils = {
   updateCartCount,
   updateAuthLink,

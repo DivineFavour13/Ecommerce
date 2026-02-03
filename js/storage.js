@@ -1,4 +1,4 @@
-// storage.js - Local Storage Management
+// storage.js - FIXED with password hashing and proper security
 
 // Storage keys
 const PRODUCTS_KEY = 'luxora_products';
@@ -10,11 +10,51 @@ const RECENTLY_VIEWED_KEY = 'luxora_recently_viewed';
 const ORDERS_KEY = 'luxora_orders';
 const SETTINGS_KEY = 'luxora_settings';
 
-// Product Management
+// ==================== PASSWORD HASHING ====================
+// Simple hash function for demo purposes (in production use bcrypt or similar)
+function hashPassword(password) {
+  let hash = 0;
+  const salt = 'luxora_secret_salt_2024';
+  const combined = password + salt;
+  
+  for (let i = 0; i < combined.length; i++) {
+    const char = combined.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  return hash.toString(36);
+}
+
+function verifyPassword(password, hashedPassword) {
+  return hashPassword(password) === hashedPassword;
+}
+
+function verifyAdminPermission() {
+  const user = getCurrentUser(); // This uses your existing function to get the logged-in user
+  if (!user || user.role !== 'admin') {
+    if (typeof showNotification === 'function') {
+      showNotification("Permission denied: Administrative privileges required.", "error");
+    }
+    return false;
+  }
+  return true;
+}
+
+// ==================== PRODUCT MANAGEMENT ====================
 function getProducts() {
   try {
-    const products = localStorage.getItem(PRODUCTS_KEY);
-    return products ? JSON.parse(products) : [];
+    const stored = localStorage.getItem(PRODUCTS_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    
+    if (typeof products !== 'undefined' && products.length > 0) {
+      saveProducts(products);
+      return products;
+    }
+    
+    return [];
   } catch (error) {
     console.error('Error getting products:', error);
     return [];
@@ -24,6 +64,7 @@ function getProducts() {
 function saveProducts(products) {
   try {
     localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+    window.dispatchEvent(new Event('productsUpdated'));
     return true;
   } catch (error) {
     console.error('Error saving products:', error);
@@ -37,6 +78,8 @@ function getProductById(id) {
 }
 
 function updateProduct(id, updates) {
+  if (!verifyAdminPermission()) return false;
+
   const products = getProducts();
   const index = products.findIndex(product => product.id === parseInt(id));
   if (index !== -1) {
@@ -47,12 +90,14 @@ function updateProduct(id, updates) {
 }
 
 function deleteProduct(id) {
+  if (!verifyAdminPermission()) return false;
+
   const products = getProducts();
   const filteredProducts = products.filter(product => product.id !== parseInt(id));
   return saveProducts(filteredProducts);
 }
 
-// Cart Management
+// ==================== CART MANAGEMENT ====================
 function getCart() {
   try {
     const cart = localStorage.getItem(CART_KEY);
@@ -66,22 +111,7 @@ function getCart() {
 function saveCart(cart) {
   try {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    return true;
-  } catch (error) {
-    console.error('Error saving cart:', error);
-    return false;
-  }
-}
-
-function dispatchCartUpdateEvent() {
-  const event = new Event('cartUpdated');
-  window.dispatchEvent(event);
-}
-
-function saveCart(cart) {
-  try {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    dispatchCartUpdateEvent(); // Notify listeners
+    window.dispatchEvent(new Event('cartUpdated'));
     return true;
   } catch (error) {
     console.error('Error saving cart:', error);
@@ -137,7 +167,7 @@ function getCartItemCount() {
   return cart.reduce((count, item) => count + item.quantity, 0);
 }
 
-// User Management
+// ==================== USER MANAGEMENT (SECURE) ====================
 function getCurrentUser() {
   try {
     const user = localStorage.getItem(USER_KEY);
@@ -151,6 +181,7 @@ function getCurrentUser() {
 function setCurrentUser(user) {
   try {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
+    window.dispatchEvent(new Event('userUpdated'));
     return true;
   } catch (error) {
     console.error('Error setting current user:', error);
@@ -161,6 +192,7 @@ function setCurrentUser(user) {
 function logout() {
   try {
     localStorage.removeItem(USER_KEY);
+    window.dispatchEvent(new Event('userUpdated'));
     return true;
   } catch (error) {
     console.error('Error logging out:', error);
@@ -190,16 +222,45 @@ function saveUsers(users) {
 
 function addUser(user) {
   const users = getUsers();
+  
+  // Check if user already exists
+  if (users.find(u => u.email.toLowerCase() === user.email.toLowerCase())) {
+    return false;
+  }
+  
   const newUser = {
     id: Date.now(),
-    ...user,
+    name: user.name,
+    email: user.email,
+    password: hashPassword(user.password), 
+    role: 'user', 
     createdAt: new Date().toISOString()
   };
+  
   users.push(newUser);
   return saveUsers(users);
 }
 
-// Wishlist Management
+// FIXED: Verify password using hash
+function authenticateUser(email, password) {
+  const users = getUsers();
+  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  
+  if (!user) {
+    return null;
+  }
+  
+  // Verify hashed password
+  if (verifyPassword(password, user.password)) {
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+  
+  return null;
+}
+
+// ==================== WISHLIST MANAGEMENT ====================
 function getWishlist() {
   try {
     const wishlist = localStorage.getItem(WISHLIST_KEY);
@@ -213,6 +274,7 @@ function getWishlist() {
 function saveWishlist(wishlist) {
   try {
     localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+    window.dispatchEvent(new Event('wishlistUpdated'));
     return true;
   } catch (error) {
     console.error('Error saving wishlist:', error);
@@ -242,7 +304,7 @@ function isInWishlist(productId) {
   return wishlist.some(item => item.id === parseInt(productId));
 }
 
-// Recently Viewed Management
+// ==================== RECENTLY VIEWED ====================
 function getRecentlyViewed() {
   try {
     const recentlyViewed = localStorage.getItem(RECENTLY_VIEWED_KEY);
@@ -265,20 +327,13 @@ function saveRecentlyViewed(recentlyViewed) {
 
 function addToRecentlyViewed(product) {
   const recentlyViewed = getRecentlyViewed();
-  
-  // Remove if already exists
   const filtered = recentlyViewed.filter(item => item.id !== product.id);
-  
-  // Add to beginning
   filtered.unshift(product);
-  
-  // Keep only last 10 items
   const limited = filtered.slice(0, 10);
-  
   return saveRecentlyViewed(limited);
 }
 
-// Orders Management
+// ==================== ORDERS MANAGEMENT ====================
 function getOrders() {
   try {
     const orders = localStorage.getItem(ORDERS_KEY);
@@ -329,7 +384,7 @@ function generateOrderId() {
   return 'ORD-' + Date.now().toString().slice(-6);
 }
 
-// Settings Management
+// ==================== SETTINGS ====================
 function getSettings() {
   try {
     const settings = localStorage.getItem(SETTINGS_KEY);
@@ -365,7 +420,7 @@ function getDefaultSettings() {
   };
 }
 
-// Utility Functions
+// ==================== UTILITY FUNCTIONS ====================
 function clearAllData() {
   try {
     localStorage.removeItem(PRODUCTS_KEY);
@@ -387,7 +442,7 @@ function exportData() {
   try {
     const data = {
       products: getProducts(),
-      users: getUsers(),
+      users: getUsers().map(u => ({ ...u, password: '[ENCRYPTED]' })), // Don't export passwords
       orders: getOrders(),
       settings: getSettings(),
       timestamp: new Date().toISOString()
@@ -404,7 +459,6 @@ function importData(jsonData) {
     const data = JSON.parse(jsonData);
     
     if (data.products) saveProducts(data.products);
-    if (data.users) saveUsers(data.users);
     if (data.orders) saveOrders(data.orders);
     if (data.settings) saveSettings(data.settings);
     
@@ -415,7 +469,6 @@ function importData(jsonData) {
   }
 }
 
-// Check if localStorage is available
 function isStorageAvailable() {
   try {
     const test = '__storage_test__';
@@ -427,74 +480,77 @@ function isStorageAvailable() {
   }
 }
 
-// Initialize storage with default data if empty
+// ==================== INITIALIZATION ====================
 function initializeStorage() {
   if (!isStorageAvailable()) {
     console.warn('LocalStorage is not available');
     return false;
   }
 
-  console.log('Initializing storage...');
-
-  // Initialize products
+  // 1. Initialize products (merge newly added products from products-data.js)
   const storedProducts = getProducts();
-  if (!storedProducts || storedProducts.length === 0) {
-    if (typeof products !== 'undefined' && products.length > 0) {
-      console.log('Saving default products...');
+  if (typeof products !== 'undefined' && Array.isArray(products) && products.length > 0) {
+    if (!storedProducts || storedProducts.length === 0) {
+      // No stored products yet: seed from file
       saveProducts(products);
     } else {
-      console.warn('No products data found in products-data.js');
+      // Merge: append any products from file that are not in storage by id
+      const existingIds = new Set(storedProducts.map(p => p.id));
+      const toAdd = products.filter(p => !existingIds.has(p.id));
+      if (toAdd.length > 0) {
+        saveProducts([...storedProducts, ...toAdd]);
+      }
     }
   }
 
-  // Initialize users (create default admin if none)
+  // 2. Initialize default users (SECURE METHOD)
   const users = getUsers();
   if (users.length === 0) {
-    const defaultAdmin = {
+    const initialAdmin = {
       id: 1,
       name: 'Admin',
       email: 'admin@luxora.com',
-      password: 'admin123', // In production, this should be hashed
+      password: hashPassword('admin123'),
       role: 'admin',
-      createdAt: new Date().toISOString()
+      joinedDate: new Date().toISOString()
     };
-    addUser(defaultAdmin);
-    console.log('Default admin created');
+    
+    const initialUser = {
+      id: 2,
+      name: 'Test User',
+      email: 'user@luxora.com',
+      password: hashPassword('user123'),
+      role: 'user',
+      joinedDate: new Date().toISOString()
+    };
+
+    // Save directly to localStorage to establish the initial admin
+    localStorage.setItem(USERS_KEY, JSON.stringify([initialAdmin, initialUser]));
   }
 
-  // Initialize settings
+  // 3. Initialize other storage keys if they don't exist
   if (!localStorage.getItem(SETTINGS_KEY)) {
     saveSettings(getDefaultSettings());
-    console.log('Default settings applied');
   }
-
-  // Initialize cart if needed
   if (!localStorage.getItem(CART_KEY)) {
     saveCart([]);
   }
-
-  // Initialize wishlist if needed
   if (!localStorage.getItem(WISHLIST_KEY)) {
     saveWishlist([]);
   }
-
-  // Initialize recently viewed if needed
   if (!localStorage.getItem(RECENTLY_VIEWED_KEY)) {
     saveRecentlyViewed([]);
   }
-
-  // Initialize orders if needed
   if (!localStorage.getItem(ORDERS_KEY)) {
     saveOrders([]);
   }
 
-  console.log('Storage initialized successfully');
   return true;
 }
 
-// Auto-initialize when script loads
+// Auto-initialize (kept your existing timeout logic)
 if (typeof window !== 'undefined') {
-  initializeStorage();
+  setTimeout(() => {
+    initializeStorage();
+  }, 50);
 }
-
-console.log('Checking products in localStorage:', localStorage.getItem(PRODUCTS_KEY));

@@ -1,36 +1,86 @@
-// home.js - Fixed version
-
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, initializing home page...');
-  
-  // Wait a bit for products to load
-  setTimeout(() => {
-    initializeHomePage();
-  }, 100);
+  initializeHomePage();
 });
 
 function initializeHomePage() {
-  console.log('Initializing home page...');
+  // FIXED: Wait for products to be available without arbitrary timeout
+  const checkProducts = () => {
+    let availableProducts = getAvailableProducts();
+    
+    if (!availableProducts || availableProducts.length === 0) {
+      // If products aren't ready, wait a bit and try again (max 5 attempts)
+      if (!checkProducts.attempts) checkProducts.attempts = 0;
+      checkProducts.attempts++;
+      
+      if (checkProducts.attempts < 5) {
+        setTimeout(checkProducts, 50);
+        return;
+      } else {
+        showNoProductsMessage();
+        return;
+      }
+    }
+    
+    window.productsData = availableProducts;
+    
+    initializeAllSections();
+  };
   
-  // Check if products are available
-  if (typeof products === 'undefined' || !products) {
-    console.error('Products not found!');
-    return;
+  checkProducts();
+}
+
+function getAvailableProducts() {
+  // Try global products first
+  if (typeof products !== 'undefined' && products && products.length > 0) {
+    return products;
   }
   
-  console.log('Products available:', products.length);
+  // Try window.productsData
+  if (window.productsData && window.productsData.length > 0) {
+    return window.productsData;
+  }
   
+  // Try localStorage
+  if (typeof getProducts === 'function') {
+    return getProducts();
+  }
+  
+  return [];
+}
+
+function initializeAllSections() {
   updateCurrentDate();
   loadFlashSalesProducts();
   loadTopSellersProducts();
   loadNewArrivalsProducts();
+  loadBrandPartners();
   setupHeroSlider();
   setupCategoryNavigation();
   setupNewsletterForm();
   startFlashSaleCountdown();
+  setupProductCardEvents && setupProductCardEvents();
 }
 
-// Update current date
+function showNoProductsMessage() {
+  const sections = [
+    'flash-sales-home',
+    'top-sellers-grid',
+    'new-arrivals-grid'
+  ];
+  
+  sections.forEach(id => {
+    const container = document.getElementById(id);
+    if (container) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: #666;">
+          <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #FF6B35; margin-bottom: 1rem;"></i>
+          <p>No products available. Please refresh the page.</p>
+        </div>
+      `;
+    }
+  });
+}
+
 function updateCurrentDate() {
   const currentDateEl = document.getElementById('current-date');
   if (currentDateEl) {
@@ -45,185 +95,208 @@ function updateCurrentDate() {
   }
 }
 
-// Load flash sales products
 function loadFlashSalesProducts() {
-  console.log('Loading flash sales...');
   const flashSalesContainer = document.getElementById('flash-sales-home');
   
-  if (!flashSalesContainer) {
-    console.error('Flash sales container not found');
-    return;
-  }
+  if (!flashSalesContainer) return;
 
-  const flashProducts = products.filter(product => product.isFlashSale).slice(0, 6);
-  console.log('Flash products found:', flashProducts.length);
+  const products = window.productsData || getProducts();
+  const flashProducts = products.filter(product => product.isFlashSale).slice(0, 8);
   
   if (flashProducts.length === 0) {
     flashSalesContainer.innerHTML = '<p class="no-products">No flash sales available</p>';
     return;
   }
 
-  // Updated flash sales HTML in loadFlashSalesProducts function
-flashSalesContainer.innerHTML = flashProducts.map(product => `
-  <div class="flash-sale-item" data-product-id="${product.id}">
-    <div class="product-image">
-      <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x180/f0f0f0/666?text=No+Image'">
-      <div class="discount-badge">
-        -${Math.round(((product.originalPrice - product.flashPrice) / product.originalPrice) * 100)}%
-      </div>
-      <div class="product-actions">
-        <button class="wishlist-btn" onclick="toggleWishlist(${product.id})" title="Add to Wishlist">
-          <i class="far fa-heart"></i>
-        </button>
-        <button class="quick-view-btn" onclick="quickViewProduct(${product.id})" title="Quick View">
-          <i class="fas fa-eye"></i>
-        </button>
-      </div>
-    </div>
-    <div class="product-info">
-      <h4>${product.name}</h4>
-      <div class="product-rating">
-        ${generateStarRating(product.rating)}
-        <span class="review-count">(${product.reviews})</span>
-      </div>
-      <div class="product-prices">
-        <span class="flash-price">₦${formatPrice(product.flashPrice)}</span>
-        <span class="original-price">₦${formatPrice(product.originalPrice)}</span>
-      </div>
-      <div class="flash-progress">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${Math.random() * 60 + 30}%"></div>
+  flashSalesContainer.innerHTML = flashProducts.map(product => {
+    const discount = product.originalPrice ? 
+      Math.round(((product.originalPrice - (product.flashPrice || product.price)) / product.originalPrice) * 100) : 
+      0;
+    
+    return `
+      <div class="flash-sale-item" data-product-id="${product.id}">
+        <div class="product-image">
+          <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+          ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+          <div class="product-actions">
+            <button class="wishlist-btn" data-id="${product.id}" title="Add to Wishlist">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="quick-view-btn" data-product-id="${product.id}" title="Quick View">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
         </div>
-        <span class="items-left">${product.stock} items left</span>
+        <div class="product-info">
+          <h4>${truncateText(product.name, 50)}</h4>
+          <div class="product-rating">
+            ${generateStarRating(product.rating || 4.5)}
+            <span class="review-count">(${product.reviews || 0})</span>
+          </div>
+          <div class="product-prices">
+            <span class="flash-price">₦${formatPrice(product.flashPrice || product.price)}</span>
+            ${product.originalPrice ? `<span class="original-price">₦${formatPrice(product.originalPrice)}</span>` : ''}
+          </div>
+          <div class="flash-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${Math.random() * 60 + 30}%"></div>
+            </div>
+            <span class="items-left">${product.stock} items left</span>
+          </div>
+          <button class="add-to-cart-btn" data-product-id="${product.id}">
+            <i class="fas fa-shopping-cart"></i> Add to Cart
+          </button>
+        </div>
       </div>
-      <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
-        <i class="fas fa-shopping-cart"></i> Add to Cart
-      </button>
-    </div>
-  </div>
-`).join('');
-
-  console.log('Flash sales loaded successfully');
+    `;
+  }).join('');
 }
 
-// Load top sellers products
 function loadTopSellersProducts() {
-  console.log('Loading top sellers...');
   const topSellersContainer = document.getElementById('top-sellers-grid');
   
-  if (!topSellersContainer) {
-    console.error('Top sellers container not found');
-    return;
-  }
+  if (!topSellersContainer) return;
 
+  const products = window.productsData || getProducts();
   const topSellerProducts = products.filter(product => product.isTopSeller).slice(0, 8);
-  console.log('Top seller products found:', topSellerProducts.length);
   
   if (topSellerProducts.length === 0) {
     topSellersContainer.innerHTML = '<p class="no-products">No top sellers available</p>';
     return;
   }
 
-  topSellersContainer.innerHTML = topSellerProducts.map(product => `
-    <div class="product-card" data-product-id="${product.id}">
-      <div class="product-image">
-        <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300/f0f0f0/666?text=No+Image'">
-        <div class="product-badge">Best Seller</div>
-        <div class="product-actions">
-          <button class="wishlist-btn" onclick="toggleWishlist(${product.id})">
-            <i class="far fa-heart"></i>
-          </button>
-          <button class="quick-view-btn" onclick="quickViewProduct(${product.id})">
-            <i class="fas fa-eye"></i>
+  topSellersContainer.innerHTML = topSellerProducts.map(product => {
+    const discount = product.originalPrice ? 
+      Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 
+      0;
+      
+    return `
+      <div class="product-card" data-product-id="${product.id}">
+        <div class="product-image">
+          <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+          <div class="product-badge">Best Seller</div>
+          ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+          <div class="product-actions">
+            <button class="wishlist-btn" data-id="${product.id}">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="quick-view-btn" data-product-id="${product.id}">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">${formatCategory(product.category)}</div>
+          <h4>${truncateText(product.name, 60)}</h4>
+          <div class="product-rating">
+            ${generateStarRating(product.rating || 4.5)}
+            <span class="review-count">(${product.reviews || 0})</span>
+          </div>
+          <div class="product-price">
+            <span class="current-price">₦${formatPrice(product.price)}</span>
+            ${product.originalPrice ? `<span class="original-price">₦${formatPrice(product.originalPrice)}</span>` : ''}
+          </div>
+          <button class="add-to-cart-btn" data-product-id="${product.id}">
+            <i class="fas fa-shopping-cart"></i> Add to Cart
           </button>
         </div>
       </div>
-      <div class="product-info">
-        <div class="product-category">${formatCategory(product.category)}</div>
-        <h4>${product.name}</h4>
-        <div class="product-rating">
-          ${generateStarRating(product.rating)}
-          <span class="review-count">(${product.reviews})</span>
-        </div>
-        <div class="product-price">
-          <span class="current-price">₦${formatPrice(product.price)}</span>
-          ${product.originalPrice ? `<span class="original-price">₦${formatPrice(product.originalPrice)}</span>` : ''}
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
-          <i class="fas fa-shopping-cart"></i> Add to Cart
-        </button>
-      </div>
-    </div>
-  `).join('');
-
-  console.log('Top sellers loaded successfully');
+    `;
+  }).join('');
 }
 
-// Load new arrivals products
 function loadNewArrivalsProducts() {
-  console.log('Loading new arrivals...');
   const newArrivalsContainer = document.getElementById('new-arrivals-grid');
   
-  if (!newArrivalsContainer) {
-    console.error('New arrivals container not found');
-    return;
-  }
+  if (!newArrivalsContainer) return;
 
+  const products = window.productsData || getProducts();
   const newArrivalProducts = products.filter(product => product.isNewArrival).slice(0, 8);
-  console.log('New arrival products found:', newArrivalProducts.length);
   
   if (newArrivalProducts.length === 0) {
     newArrivalsContainer.innerHTML = '<p class="no-products">No new arrivals available</p>';
     return;
   }
 
-  newArrivalsContainer.innerHTML = newArrivalProducts.map(product => `
-    <div class="product-card" data-product-id="${product.id}">
-      <div class="product-image">
-        <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300/f0f0f0/666?text=No+Image'">
-        <div class="product-badge new">New</div>
-        <div class="product-actions">
-          <button class="wishlist-btn" onclick="toggleWishlist(${product.id})">
-            <i class="far fa-heart"></i>
-          </button>
-          <button class="quick-view-btn" onclick="quickViewProduct(${product.id})">
-            <i class="fas fa-eye"></i>
+  newArrivalsContainer.innerHTML = newArrivalProducts.map(product => {
+    const discount = product.originalPrice ? 
+      Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 
+      0;
+      
+    return `
+      <div class="product-card" data-product-id="${product.id}">
+        <div class="product-image">
+          <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+          <div class="product-badge new">New</div>
+          ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+          <div class="product-actions">
+            <button class="wishlist-btn" data-id="${product.id}">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="quick-view-btn" data-product-id="${product.id}">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">${formatCategory(product.category)}</div>
+          <h4>${truncateText(product.name, 60)}</h4>
+          <div class="product-rating">
+            ${generateStarRating(product.rating || 4.5)}
+            <span class="review-count">(${product.reviews || 0})</span>
+          </div>
+          <div class="product-price">
+            <span class="current-price">₦${formatPrice(product.price)}</span>
+            ${product.originalPrice ? `<span class="original-price">₦${formatPrice(product.originalPrice)}</span>` : ''}
+          </div>
+          <button class="add-to-cart-btn" data-product-id="${product.id}">
+            <i class="fas fa-shopping-cart"></i> Add to Cart
           </button>
         </div>
       </div>
-      <div class="product-info">
-        <div class="product-category">${formatCategory(product.category)}</div>
-        <h4>${product.name}</h4>
-        <div class="product-rating">
-          ${generateStarRating(product.rating)}
-          <span class="review-count">(${product.reviews})</span>
-        </div>
-        <div class="product-price">
-          <span class="current-price">₦${formatPrice(product.price)}</span>
-          ${product.originalPrice ? `<span class="original-price">₦${formatPrice(product.originalPrice)}</span>` : ''}
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
-          <i class="fas fa-shopping-cart"></i> Add to Cart
-        </button>
-      </div>
-    </div>
-  `).join('');
-
-  console.log('New arrivals loaded successfully');
+    `;
+  }).join('');
 }
 
-// Flash sale countdown - FIXED
+function loadBrandPartners() {
+  const wrap = document.querySelector('.brand-partners .brands');
+  if (!wrap) return;
+
+  const brands = [
+    'images/Apple.png',
+    'images/Nike.png',
+    'images/brands/brand-3.png',
+    'images/brands/brand-4.png',
+    'images/brands/brand-5.png',
+    'images/brands/brand-6.png'
+  ];
+
+  const placeholder = "data:image/svg+xml;utf8,"
+    + "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='80'>"
+    + "<rect width='100%' height='100%' fill='%23f3f3f3'/>"
+    + "<text x='50%' y='50%' font-size='14' text-anchor='middle' dominant-baseline='middle' fill='%23bdbdbd'>Brand</text>"
+    + "</svg>";
+
+  wrap.innerHTML = brands.map(src => {
+    return `<div class="brand"><img src="${src}" alt="brand" onerror="this.onerror=null;this.src='${placeholder}'"></div>`;
+  }).join('');
+}
+
 function startFlashSaleCountdown() {
-  console.log('Starting countdown...');
   const countdownElement = document.getElementById('home-countdown');
   
-  if (!countdownElement) {
-    console.error('Countdown element not found');
-    return;
-  }
+  if (!countdownElement) return;
 
-  // Set countdown to 12 hours from now (as shown in your image)
-  const endTime = new Date().getTime() + (12 * 60 * 60 * 1000);
+  // Check if we have a stored end time
+  let endTime = localStorage.getItem('flash_sale_end_time');
+  
+  if (!endTime) {
+    // Set countdown to 12 hours from now
+    endTime = new Date().getTime() + (12 * 60 * 60 * 1000);
+    localStorage.setItem('flash_sale_end_time', endTime);
+  } else {
+    endTime = parseInt(endTime);
+  }
 
   function updateCountdown() {
     const now = new Date().getTime();
@@ -231,6 +304,8 @@ function startFlashSaleCountdown() {
 
     if (distance < 0) {
       countdownElement.innerHTML = "SALE ENDED";
+      // Reset for next sale
+      localStorage.removeItem('flash_sale_end_time');
       return;
     }
 
@@ -241,16 +316,10 @@ function startFlashSaleCountdown() {
     countdownElement.innerHTML = `${hours.toString().padStart(2, '0')}h : ${minutes.toString().padStart(2, '0')}m : ${seconds.toString().padStart(2, '0')}s`;
   }
 
-  // Update immediately
   updateCountdown();
-  
-  // Update every second
-  const timer = setInterval(updateCountdown, 1000);
-  
-  console.log('Countdown started successfully');
+  setInterval(updateCountdown, 1000);
 }
 
-// Hero slider functionality
 function setupHeroSlider() {
   const slider = document.getElementById('hero-slider');
   const indicators = document.querySelectorAll('.indicator');
@@ -263,14 +332,13 @@ function setupHeroSlider() {
 
   if (totalSlides === 0) return;
 
-  // Auto slide functionality
-  setInterval(() => {
+  const autoSlide = setInterval(() => {
     showSlide((currentSlide + 1) % totalSlides);
   }, 5000);
 
-  // Indicator click handlers
   indicators.forEach((indicator, index) => {
     indicator.addEventListener('click', () => {
+      clearInterval(autoSlide);
       showSlide(index);
     });
   });
@@ -285,7 +353,6 @@ function setupHeroSlider() {
   }
 }
 
-// Category navigation
 function setupCategoryNavigation() {
   const categoryCards = document.querySelectorAll('.category-card');
   const categoryLinks = document.querySelectorAll('.hero-categories a');
@@ -310,7 +377,6 @@ function setupCategoryNavigation() {
   });
 }
 
-// Newsletter form
 function setupNewsletterForm() {
   const newsletterForm = document.getElementById('newsletter-form');
   
@@ -319,7 +385,7 @@ function setupNewsletterForm() {
       e.preventDefault();
       const email = document.getElementById('newsletter-email').value;
       
-      if (email) {
+      if (email && isValidEmail(email)) {
         showNotification('Thank you for subscribing to our newsletter!', 'success');
         newsletterForm.reset();
       } else {
@@ -329,10 +395,80 @@ function setupNewsletterForm() {
   }
 }
 
+function setupProductCardEvents() {
+  document.body.addEventListener('click', function (e) {
+    const target = e.target;
+
+    const addToCartBtn = target.closest && target.closest('.add-to-cart-btn');
+    if (addToCartBtn) {
+      const id = addToCartBtn.dataset.productId;
+      if (id) {
+        if (typeof addToCart === 'function') addToCart(id);
+        else if (typeof addProductToCart === 'function') addProductToCart(id);
+        else {
+          try {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existing = cart.find(i => i.id === id);
+            if (existing) existing.qty = (existing.qty || 1) + 1;
+            else cart.push({ id, qty: 1 });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            if (typeof updateCartCount === 'function') updateCartCount();
+          } catch (err) {}
+        }
+      }
+      e.preventDefault();
+      return;
+    }
+
+    const wishlistBtn = target.closest && target.closest('.wishlist-btn');
+    if (wishlistBtn) {
+      const id = wishlistBtn.dataset.id || wishlistBtn.dataset.productId;
+      if (id) {
+        if (typeof toggleWishlist === 'function') toggleWishlist(id);
+        else {
+          const key = 'wishlist';
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          const exists = list.includes(id);
+          if (exists) localStorage.setItem(key, JSON.stringify(list.filter(x => x !== id)));
+          else { list.push(id); localStorage.setItem(key, JSON.stringify(list)); }
+        }
+      }
+      e.preventDefault();
+      return;
+    }
+
+    const quickViewBtn = target.closest && target.closest('.quick-view-btn');
+    if (quickViewBtn) {
+      const id = quickViewBtn.dataset.productId;
+      if (id) {
+        if (typeof openQuickView === 'function') openQuickView(id);
+        else if (typeof openProductModal === 'function') openProductModal(id);
+        else window.location.href = `product.html?id=${encodeURIComponent(id)}`;
+      }
+      e.preventDefault();
+      return;
+    }
+
+    const productCard = target.closest && target.closest('.product-card, .flash-sale-item');
+    if (productCard) {
+      const id = productCard.dataset.productId;
+      if (id) window.location.href = `product.html?id=${encodeURIComponent(id)}`;
+    }
+  });
+
+  document.querySelectorAll('.product-image img, .brand img').forEach(img => {
+    img.addEventListener('error', function () {
+      if (this.dataset._errored) return;
+      this.dataset._errored = '1';
+      this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='100%25' height='100%25' fill='%23f3f3f3'/%3E%3Ctext x='50%25' y='50%25' font-size='14' text-anchor='middle' dominant-baseline='middle' fill='%23bdbdbd'%3ENo Image%3C/text%3E%3C/svg%3E";
+    }, { passive: true });
+  });
+}
+
 // Utility functions
 function generateStarRating(rating) {
   const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
+  const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   let starsHTML = '';
@@ -372,116 +508,12 @@ function formatCategory(category) {
   return categoryMap[category] || category;
 }
 
-// Product interaction functions
-function addToCart(productId) {
-  console.log('Adding to cart:', productId);
-  const product = products.find(p => p.id === productId);
-  if (!product) {
-    console.error('Product not found:', productId);
-    return;
-  }
-
-  let cart = getCart();
-  const existingItem = cart.find(item => item.id === productId);
-
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.flashPrice || product.price,
-      image: product.image,
-      quantity: 1
-    });
-  }
-
-  localStorage.setItem('luxora_cart', JSON.stringify(cart));
-  updateCartCount();
-  showNotification(`${product.name} added to cart!`, 'success');
+function truncateText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
 }
 
-function toggleWishlist(productId) {
-  console.log('Toggle wishlist:', productId);
-  const product = products.find(p => p.id === productId);
-  if (!product) return;
-
-  let wishlist = getWishlist();
-  const existingIndex = wishlist.findIndex(item => item.id === productId);
-
-  if (existingIndex > -1) {
-    wishlist.splice(existingIndex, 1);
-    showNotification(`${product.name} removed from wishlist`, 'info');
-  } else {
-    wishlist.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image
-    });
-    showNotification(`${product.name} added to wishlist!`, 'success');
-  }
-
-  localStorage.setItem('luxora_wishlist', JSON.stringify(wishlist));
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
-
-function quickViewProduct(productId) {
-  console.log('Quick view:', productId);
-  window.location.href = `product.html?id=${productId}`;
-}
-
-// Helper functions
-function getCart() {
-  const cartStr = localStorage.getItem('luxora_cart');
-  return cartStr ? JSON.parse(cartStr) : [];
-}
-
-function getWishlist() {
-  const wishlistStr = localStorage.getItem('luxora_wishlist');
-  return wishlistStr ? JSON.parse(wishlistStr) : [];
-}
-
-function updateCartCount() {
-  const cartCountEl = document.getElementById('cart-count');
-  if (cartCountEl) {
-    const cart = getCart();
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCountEl.textContent = totalItems;
-  }
-}
-
-function showNotification(message, type = 'info') {
-  console.log('Notification:', message, type);
-  
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
-  notification.innerHTML = `
-    <div class="notification-content">
-      <i class="fas fa-${getNotificationIcon(type)}"></i>
-      <span>${message}</span>
-    </div>
-  `;
-  
-  // Add to page
-  document.body.appendChild(notification);
-  
-  // Auto remove after 3 seconds
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
-}
-
-function getNotificationIcon(type) {
-  switch (type) {
-    case 'success': return 'check-circle';
-    case 'error': return 'exclamation-circle';
-    case 'warning': return 'exclamation-triangle';
-    default: return 'info-circle';
-  }
-}
-
-// Initialize cart count on page load
-document.addEventListener('DOMContentLoaded', function() {
-  updateCartCount();
-});

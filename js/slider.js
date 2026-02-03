@@ -57,6 +57,22 @@ function initializeSlider() {
       indicator.setAttribute('aria-label', `Go to slide ${index + 1}`);
       indicator.setAttribute('tabindex', index === 0 ? '0' : '-1');
     });
+
+    // Update height when images load
+    slides.forEach((slide) => {
+      const img = slide.querySelector('.slide-image');
+      if (img) {
+        if (img.complete) {
+          // already loaded
+          updateSliderHeight();
+        } else {
+          img.addEventListener('load', updateSliderHeight, { once: true });
+        }
+      }
+    });
+
+    // Initial sizing
+    updateSliderHeight();
   }
   
   function goToSlide(slideIndex, direction = 'next') {
@@ -91,6 +107,9 @@ function initializeSlider() {
       indicator.classList.toggle('active', index === currentSlide);
       indicator.setAttribute('tabindex', index === currentSlide ? '0' : '-1');
     });
+
+    // Adjust height for the new image
+    updateSliderHeight();
     
     // Announce slide change to screen readers
     announceSlideChange();
@@ -306,10 +325,36 @@ function initializeSlider() {
   }
   
   function handleResize() {
-    // Recalculate any position-dependent values if needed
-    // Currently not needed but useful for future enhancements
+    updateSliderHeight();
   }
   
+  // Dynamically size slider to match active image aspect ratio
+  function updateSliderHeight() {
+    const active = slides[currentSlide];
+    if (!active) return;
+    const img = active.querySelector('.slide-image');
+    if (!img) return;
+
+    const containerWidth = slider.clientWidth || active.clientWidth || window.innerWidth;
+    let height;
+
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      const ratio = img.naturalHeight / img.naturalWidth;
+      height = Math.round(containerWidth * ratio);
+    } else {
+      // Fallback ratio similar to typical hero banners
+      height = Math.round(containerWidth * (6 / 16));
+    }
+
+    const minH = 200; // mobile minimum
+    const maxH = 350; // desktop cap
+    height = Math.max(minH, Math.min(maxH, height));
+
+    // Apply and override any aspect-ratio from CSS
+    slider.style.aspectRatio = '';
+    slider.style.height = height + 'px';
+  }
+
   function announceSlideChange() {
     // Create a live region for screen reader announcements
     let liveRegion = document.getElementById('slider-live-region');

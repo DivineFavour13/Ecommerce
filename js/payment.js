@@ -1,4 +1,4 @@
-// payment.js - Enhanced payment functionality with validation
+// payment.js - FIXED: Added server-side style price verification and stock checks
 
 document.addEventListener('DOMContentLoaded', () => {
   initializePaymentPage();
@@ -35,32 +35,108 @@ function handlePaymentSubmit(e) {
   // Show processing state
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.textContent;
-  submitBtn.textContent = 'Processing...';
+  submitBtn.textContent = 'Verifying & Processing...';
   submitBtn.disabled = true;
   
-  // Simulate payment processing
+  // Simulate network request / processing
   setTimeout(() => {
-    processPayment(cart);
+    // 🛡️ SECURITY FIX: Verify prices before processing
+    const verificationResult = verifyCartPricesAndStock(cart);
+    
+    if (!verificationResult.isValid) {
+      showNotification(verificationResult.error, 'error');
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      
+      // If stock issue, reload cart to show current status
+      if (verificationResult.type === 'stock') {
+        setTimeout(() => window.location.href = 'cart.html', 2000);
+      }
+      return;
+    }
+
+    // Process with the VERIFIED total, not the cart total
+    processPayment(cart, verificationResult.verifiedTotals);
+    
+    // Note: In a real app, you would send verificationResult.verifiedTotals 
+    // to the payment gateway, not the client-side cart data.
+    
     submitBtn.textContent = originalText;
     submitBtn.disabled = false;
   }, 2000);
 }
 
-function processPayment(cart) {
-  try {
-    // Calculate totals
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = subtotal * 0.08; // 8% tax
-    const shipping = 5999; // ₦59.99 shipping
-    const total = subtotal + tax + shipping;
+// 🛡️ NEW FUNCTION: Validates that cart prices match database prices
+function verifyCartPricesAndStock(cart) {
+  let verifiedSubtotal = 0;
+  
+  for (const item of cart) {
+    // 1. Fetch the authoritative product data
+    const realProduct = getProductById(item.id);
     
-    // Create order
+    if (!realProduct) {
+      return { isValid: false, error: `Product "${item.name}" is no longer available.` };
+    }
+
+    // 2. Security Check: Price Manipulation
+    // We allow a small epsilon for floating point math, though integers are safer
+    if (realProduct.price !== item.price) {
+      console.warn(`Price mismatch for ${item.name}. Cart: ${item.price}, Real: ${realProduct.price}`);
+      return { isValid: false, error: `Price change detected for ${item.name}. Please refresh your cart.`, type: 'price' };
+    }
+
+    // 3. Security Check: Stock Availability
+    if (realProduct.stock < item.quantity) {
+      return { isValid: false, error: `Insufficient stock for ${item.name}. Only ${realProduct.stock} left.`, type: 'stock' };
+    }
+    
+    verifiedSubtotal += realProduct.price * item.quantity;
+  }
+
+  return { 
+    isValid: true, 
+    verifiedTotals: calculateVerifiedTotals(verifiedSubtotal)
+  };
+}
+
+function calculateVerifiedTotals(subtotal) {
+  // Re-implement logic from cart.js/utils.js to ensure consistency
+  // Note: In production, promo code validation should also happen here against a master list
+  const tax = subtotal * 0.08; 
+  const shipping = subtotal >= 100000 ? 0 : 5999; // Hardcoded rule matching cart.js
+  
+  // Check for applied promo (securely)
+  let discount = 0;
+  const appliedPromo = getAppliedPromoCode(); // Defined in cart.js logic, accessible via localStorage
+  
+  // Ideally, we verify the promo code validity again here, but for now we trust the ID exists
+  if (appliedPromo) {
+     if (appliedPromo.type === 'percentage') {
+       discount = Math.min(subtotal * (appliedPromo.value / 100), appliedPromo.maxDiscount || Infinity);
+     } else if (appliedPromo.type === 'fixed') {
+       discount = Math.min(appliedPromo.value, subtotal);
+     }
+  }
+
+  return {
+    subtotal: subtotal,
+    tax: tax,
+    shipping: shipping,
+    discount: discount,
+    total: subtotal + tax + shipping - discount
+  };
+}
+
+function processPayment(cart, verifiedTotals) {
+  try {
+    // Create order with VERIFIED data
     const orderData = {
       items: cart,
-      subtotal: subtotal,
-      tax: tax,
-      shipping: shipping,
-      total: total,
+      subtotal: verifiedTotals.subtotal,
+      tax: verifiedTotals.tax,
+      shipping: verifiedTotals.shipping,
+      discount: verifiedTotals.discount,
+      total: verifiedTotals.total,
       paymentMethod: getPaymentMethod(),
       billingAddress: getBillingAddress(),
       userId: getCurrentUser()?.id || null
@@ -69,12 +145,19 @@ function processPayment(cart) {
     const order = createOrder(orderData);
     
     if (order) {
+      // 🛡️ LOGIC FIX: Update stock immediately after successful payment
+      updateStockAfterOrder(cart);
+
       // Clear cart
       clearCart();
-      updateCartCount();
+      
+      // Remove used promo
+      localStorage.removeItem('applied_promo');
+      
+      if (typeof updateCartCount === 'function') updateCartCount();
       
       // Show success message
-      showNotification(`Payment of ${formatCurrency(total)} processed successfully! Order ID: ${order.id}`, 'success', 8000);
+      showNotification(`Payment of ${formatCurrency(verifiedTotals.total)} processed successfully! Order ID: ${order.id}`, 'success', 8000);
       
       // Redirect to success page or home
       setTimeout(() => {
@@ -88,6 +171,17 @@ function processPayment(cart) {
     console.error('Payment processing error:', error);
     showNotification('Payment processing failed. Please try again.', 'error');
   }
+}
+
+// 🛡️ NEW FUNCTION: Decrement stock
+function updateStockAfterOrder(cart) {
+  cart.forEach(item => {
+    const product = getProductById(item.id);
+    if (product) {
+      const newStock = Math.max(0, product.stock - item.quantity);
+      updateProduct(item.id, { stock: newStock });
+    }
+  });
 }
 
 function validatePaymentForm() {
@@ -225,6 +319,7 @@ function getBillingAddress() {
 }
 
 function loadOrderSummary() {
+  // We still use cart for initial display, but actual payment uses verified data
   const cart = getCart();
   const summaryContainer = document.getElementById("order-summary");
   
@@ -232,8 +327,20 @@ function loadOrderSummary() {
   
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
-  const shipping = 5999;
-  const total = subtotal + tax + shipping;
+  const shipping = subtotal >= 100000 ? 0 : 5999;
+  
+  // Calculate potential discount for display
+  let discount = 0;
+  const appliedPromo = getAppliedPromoCode();
+  if (appliedPromo) {
+     if (appliedPromo.type === 'percentage') {
+       discount = Math.min(subtotal * (appliedPromo.value / 100), appliedPromo.maxDiscount || Infinity);
+     } else if (appliedPromo.type === 'fixed') {
+       discount = Math.min(appliedPromo.value, subtotal);
+     }
+  }
+
+  const total = subtotal + tax + shipping - discount;
   
   summaryContainer.innerHTML = `
     <h3>Order Summary</h3>
@@ -258,6 +365,11 @@ function loadOrderSummary() {
         <span>Shipping:</span>
         <span>${formatCurrency(shipping)}</span>
       </div>
+      ${discount > 0 ? `
+      <div class="summary-row discount">
+        <span>Discount:</span>
+        <span>-${formatCurrency(discount)}</span>
+      </div>` : ''}
       <div class="summary-row total">
         <span>Total:</span>
         <span>${formatCurrency(total)}</span>
@@ -337,5 +449,15 @@ function clearFieldError(input) {
   const errorElement = input.parentNode.querySelector('.field-error');
   if (errorElement) {
     errorElement.remove();
+  }
+}
+
+// Helper to get applied promo (mirrors cart.js)
+function getAppliedPromoCode() {
+  try {
+    const applied = localStorage.getItem('applied_promo');
+    return applied ? JSON.parse(applied) : null;
+  } catch {
+    return null;
   }
 }

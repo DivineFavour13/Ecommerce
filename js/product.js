@@ -1,5 +1,3 @@
-// product.js - Product details page functionality
-
 document.addEventListener('DOMContentLoaded', () => {
   initializeProductPage();
 });
@@ -17,27 +15,14 @@ function initializeProductPage() {
     return;
   }
 
+  // Load the product from storage
   const product = getProductById(parseInt(productId));
-
   if (!product) {
-    console.warn('Product not found:', productId);
+    console.error('Product not found for id:', productId);
     showNotification('Product not found', 'error');
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 2000);
-    return;
-  }
-
-  const product = getProductById(parseInt(productId));
-
-  if (!product) {
-    console.warn('Product not found:', productId);
-    showNotification('Product not found', 'error');
-
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 2000);
-
     return;
   }
 
@@ -47,7 +32,7 @@ function initializeProductPage() {
   setupProductActions(product);
   setupProductTabs(product);
   setupImageGallery(product);
-  loadRelatedProducts(productId);
+  loadRelatedProducts(product.id);
   updateCartCount();
   updateAuthLink();
 
@@ -58,16 +43,16 @@ function initializeProductPage() {
 // Load product details
 function loadProductDetails(productId) {
   const product = getProductById(parseInt(productId));
-  
+
   if (!product) {
     showNotification('Product not found', 'error');
     window.location.href = 'index.html';
     return;
   }
-  
+
   // Add to recently viewed
   addToRecentlyViewed(product);
-  
+
   renderProductDetails(product);
   updateBreadcrumb(product);
   setupProductActions(product);
@@ -77,11 +62,11 @@ function loadProductDetails(productId) {
 function renderProductDetails(product) {
   const container = document.getElementById('product-details');
   if (!container) return;
-  
-  const discount = product.oldPrice ? Math.round(100 - (product.price / product.oldPrice) * 100) : 0;
-  const stockPercentage = product.stockMax ? 
+
+  const discount = product.originalPrice ? Math.round(100 - (product.price / product.originalPrice) * 100) : 0;
+  const stockPercentage = product.stockMax ?
     Math.floor(((product.stockMax - product.stock) / product.stockMax) * 100) : 0;
-  
+
   container.innerHTML = `
     <div class="product-images">
       <div class="main-image">
@@ -114,8 +99,8 @@ function renderProductDetails(product) {
       
       <div class="product-price">
         <span class="current-price">${formatCurrency(product.price)}</span>
-        ${product.oldPrice ? `
-          <span class="old-price">${formatCurrency(product.oldPrice)}</span>
+        ${product.originalPrice ? `
+          <span class="old-price">${formatCurrency(product.originalPrice)}</span>
           <span class="discount-percentage">-${discount}%</span>
         ` : ''}
       </div>
@@ -188,7 +173,7 @@ function renderProductDetails(product) {
       </div>
     </div>
   `;
-  
+
   // Update product description tab
   const descriptionTab = document.getElementById('product-description');
   if (descriptionTab) {
@@ -198,7 +183,7 @@ function renderProductDetails(product) {
       ${product.features ? generateDetailedFeatures(product.features) : ''}
     `;
   }
-  
+
   // Update specifications tab
   const specsTab = document.getElementById('product-specs');
   if (specsTab) {
@@ -209,12 +194,14 @@ function renderProductDetails(product) {
 // Generate additional images (mock for demo)
 function generateAdditionalImages(product) {
   // In a real app, these would come from the product data
-  const additionalImages = [
-    product.image.replace('.jpg', '_2.jpg'),
-    product.image.replace('.jpg', '_3.jpg'),
-    product.image.replace('.jpg', '_4.jpg')
-  ];
-  
+  const additionalImages = (product.images && product.images.length > 1)
+    ? product.images.slice(1)
+    : [
+      product.image.replace('.jpg', '_2.jpg'),
+      product.image.replace('.jpg', '_3.jpg'),
+      product.image.replace('.jpg', '_4.jpg')
+    ];
+
   return additionalImages.map(img => `
     <div class="thumbnail">
       <img src="${img}" alt="${product.name}" onerror="this.style.display='none'">
@@ -225,7 +212,7 @@ function generateAdditionalImages(product) {
 // Generate product features
 function generateProductFeatures(features) {
   if (!features || !Array.isArray(features)) return '';
-  
+
   return `
     <div class="product-features">
       <h4>Key Features</h4>
@@ -239,7 +226,7 @@ function generateProductFeatures(features) {
 // Generate detailed features for description tab
 function generateDetailedFeatures(features) {
   if (!features || !Array.isArray(features)) return '';
-  
+
   return `
     <h3>Features & Benefits</h3>
     <ul>
@@ -251,7 +238,7 @@ function generateDetailedFeatures(features) {
 // Generate product options (color, size, etc.)
 function generateProductOptions(product) {
   let optionsHtml = '';
-  
+
   if (product.colors && product.colors.length > 0) {
     optionsHtml += `
       <div class="product-options">
@@ -269,7 +256,7 @@ function generateProductOptions(product) {
       </div>
     `;
   }
-  
+
   if (product.sizes && product.sizes.length > 0) {
     optionsHtml += `
       <div class="product-options">
@@ -284,7 +271,7 @@ function generateProductOptions(product) {
       </div>
     `;
   }
-  
+
   return optionsHtml;
 }
 
@@ -304,7 +291,7 @@ function generateSpecifications(product) {
       'Warranty': product.warranty || '1 Year'
     }
   };
-  
+
   return Object.keys(specs).map(category => `
     <div class="spec-category">
       <h4>${category}</h4>
@@ -341,21 +328,21 @@ function generateStars(rating) {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-  
+
   let starsHtml = '';
-  
+
   for (let i = 0; i < fullStars; i++) {
     starsHtml += '<i class="fas fa-star"></i>';
   }
-  
+
   if (hasHalfStar) {
     starsHtml += '<i class="fas fa-star-half-alt"></i>';
   }
-  
+
   for (let i = 0; i < emptyStars; i++) {
     starsHtml += '<i class="far fa-star"></i>';
   }
-  
+
   return starsHtml;
 }
 
@@ -363,7 +350,7 @@ function generateStars(rating) {
 function updateBreadcrumb(product) {
   const categoryEl = document.getElementById('breadcrumb-category');
   const productEl = document.getElementById('breadcrumb-product');
-  
+
   if (categoryEl) categoryEl.textContent = product.category;
   if (productEl) productEl.textContent = product.name;
 }
@@ -382,9 +369,9 @@ function setupQuantityControls(product) {
   const quantityInput = document.getElementById('quantity-input');
   const decreaseBtn = document.getElementById('decrease-qty');
   const increaseBtn = document.getElementById('increase-qty');
-  
+
   if (!quantityInput || !decreaseBtn || !increaseBtn) return;
-  
+
   decreaseBtn.addEventListener('click', () => {
     const currentQty = parseInt(quantityInput.value);
     if (currentQty > 1) {
@@ -392,7 +379,7 @@ function setupQuantityControls(product) {
       updateQuantityButtons();
     }
   });
-  
+
   increaseBtn.addEventListener('click', () => {
     const currentQty = parseInt(quantityInput.value);
     if (currentQty < product.stock) {
@@ -400,7 +387,7 @@ function setupQuantityControls(product) {
       updateQuantityButtons();
     }
   });
-  
+
   quantityInput.addEventListener('change', () => {
     let qty = parseInt(quantityInput.value);
     if (isNaN(qty) || qty < 1) qty = 1;
@@ -408,7 +395,7 @@ function setupQuantityControls(product) {
     quantityInput.value = qty;
     updateQuantityButtons();
   });
-  
+
   function updateQuantityButtons() {
     const qty = parseInt(quantityInput.value);
     decreaseBtn.disabled = qty <= 1;
@@ -420,29 +407,29 @@ function setupQuantityControls(product) {
 function setupAddToCart(product) {
   const addToCartBtn = document.getElementById('add-to-cart-btn');
   if (!addToCartBtn) return;
-  
+
   addToCartBtn.addEventListener('click', () => {
     if (product.stock === 0) {
       showNotification('This item is out of stock', 'error');
       return;
     }
-    
+
     const quantity = parseInt(document.getElementById('quantity-input').value);
     const selectedOptions = getSelectedOptions();
-    
+
     const cartItem = {
       ...product,
       quantity: quantity,
       ...selectedOptions
     };
-    
+
     const cart = getCart();
-    const existingItem = cart.find(item => 
-      item.id === product.id && 
-      item.color === selectedOptions.color && 
+    const existingItem = cart.find(item =>
+      item.id === product.id &&
+      item.color === selectedOptions.color &&
       item.size === selectedOptions.size
     );
-    
+
     if (existingItem) {
       const newQuantity = existingItem.quantity + quantity;
       if (newQuantity <= product.stock) {
@@ -458,12 +445,12 @@ function setupAddToCart(product) {
       saveCart(cart);
       showNotification(`${product.name} added to cart`, 'success');
     }
-    
+
     updateCartCount();
-    
+
     // Update product stock
     updateProduct(product.id, { stock: product.stock - quantity });
-    
+
     // Refresh product display
     setTimeout(() => {
       loadProductDetails(product.id);
@@ -475,13 +462,13 @@ function setupAddToCart(product) {
 function setupBuyNow(product) {
   const buyNowBtn = document.getElementById('buy-now-btn');
   if (!buyNowBtn) return;
-  
+
   buyNowBtn.addEventListener('click', () => {
     // Add to cart first
     const addToCartBtn = document.getElementById('add-to-cart-btn');
     if (addToCartBtn) {
       addToCartBtn.click();
-      
+
       // Redirect to cart after a short delay
       setTimeout(() => {
         window.location.href = 'cart.html';
@@ -494,10 +481,10 @@ function setupBuyNow(product) {
 function setupWishlist(product) {
   const wishlistBtn = document.querySelector('.wishlist-btn');
   if (!wishlistBtn) return;
-  
+
   // Update button state
   updateWishlistButton(wishlistBtn, product.id);
-  
+
   wishlistBtn.addEventListener('click', (e) => {
     e.preventDefault();
     toggleWishlist(product);
@@ -507,7 +494,7 @@ function setupWishlist(product) {
 // Toggle wishlist
 function toggleWishlist(product) {
   const isInWish = isInWishlist(product.id);
-  
+
   if (isInWish) {
     removeFromWishlist(product.id);
     showNotification(`${product.name} removed from wishlist`, 'info');
@@ -515,7 +502,7 @@ function toggleWishlist(product) {
     addToWishlist(product);
     showNotification(`${product.name} added to wishlist`, 'success');
   }
-  
+
   // Update button state
   const wishlistBtn = document.querySelector('.wishlist-btn');
   updateWishlistButton(wishlistBtn, product.id);
@@ -525,7 +512,7 @@ function toggleWishlist(product) {
 function updateWishlistButton(button, productId) {
   const isInWish = isInWishlist(productId);
   const icon = button.querySelector('i');
-  
+
   if (isInWish) {
     icon.className = 'fas fa-heart';
     button.classList.add('active');
@@ -545,7 +532,7 @@ function setupProductOptions() {
       option.classList.add('active');
     });
   });
-  
+
   // Size options
   const sizeOptions = document.querySelectorAll('.size-option');
   sizeOptions.forEach(option => {
@@ -560,7 +547,7 @@ function setupProductOptions() {
 function getSelectedOptions() {
   const selectedColor = document.querySelector('.color-option.active');
   const selectedSize = document.querySelector('.size-option.active');
-  
+
   return {
     color: selectedColor ? selectedColor.getAttribute('data-color') : null,
     size: selectedSize ? selectedSize.getAttribute('data-size') : null
@@ -571,13 +558,13 @@ function getSelectedOptions() {
 function setupImageGallery() {
   const thumbnails = document.querySelectorAll('.thumbnail');
   const mainImage = document.getElementById('main-product-image');
-  
+
   thumbnails.forEach(thumbnail => {
     thumbnail.addEventListener('click', () => {
       const img = thumbnail.querySelector('img');
       if (img && mainImage) {
         mainImage.src = img.src;
-        
+
         // Update active thumbnail
         thumbnails.forEach(t => t.classList.remove('active'));
         thumbnail.classList.add('active');
@@ -590,15 +577,15 @@ function setupImageGallery() {
 function setupProductTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabPanes = document.querySelectorAll('.tab-pane');
-  
+
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
-      
+
       // Update active tab button
       tabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      
+
       // Update active tab pane
       tabPanes.forEach(pane => pane.classList.remove('active'));
       const targetPane = document.getElementById(`${targetTab}-tab`);
@@ -607,7 +594,7 @@ function setupProductTabs() {
       }
     });
   });
-  
+
   // Handle review count update
   const reviewCount = document.getElementById('review-count');
   if (reviewCount) {
@@ -619,37 +606,38 @@ function setupProductTabs() {
 function loadRelatedProducts(currentProductId) {
   const relatedGrid = document.getElementById('related-products-grid');
   if (!relatedGrid) return;
-  
+
   const currentProduct = getProductById(parseInt(currentProductId));
   if (!currentProduct) return;
-  
+
   const allProducts = getProducts();
-  
+
   // Filter products by same category, excluding current product
-  let relatedProducts = allProducts.filter(product => 
-    product.category === currentProduct.category && 
+  let relatedProducts = allProducts.filter(product =>
+    product.category === currentProduct.category &&
     product.id !== currentProduct.id
   );
-  
+
   // If not enough related products, add random products
   if (relatedProducts.length < 6) {
     const additionalProducts = allProducts
       .filter(product => product.id !== currentProduct.id && !relatedProducts.includes(product))
       .slice(0, 6 - relatedProducts.length);
-    
+
     relatedProducts = [...relatedProducts, ...additionalProducts];
   }
-  
+
   // Limit to 6 products
   relatedProducts = relatedProducts.slice(0, 6);
-  
+
+  // Render related products
   renderRelatedProducts(relatedGrid, relatedProducts);
 }
 
 // Render related products
 function renderRelatedProducts(container, products) {
   container.innerHTML = '';
-  
+
   products.forEach(product => {
     const card = createRelatedProductCard(product);
     container.appendChild(card);
@@ -658,11 +646,11 @@ function renderRelatedProducts(container, products) {
 
 // Create related product card
 function createRelatedProductCard(product) {
-  const discount = product.oldPrice ? Math.round(100 - (product.price / product.oldPrice) * 100) : 0;
-  
+  const discount = product.originalPrice ? Math.round(100 - (product.price / product.originalPrice) * 100) : 0;
+
   const card = document.createElement('div');
   card.className = 'product-card';
-  
+
   card.innerHTML = `
     <div class="product-image">
       <a href="product.html?id=${product.id}">
@@ -678,14 +666,14 @@ function createRelatedProductCard(product) {
       </div>
       <div class="price">
         ${formatCurrency(product.price)}
-        ${product.oldPrice ? `<span class="old-price">${formatCurrency(product.oldPrice)}</span>` : ''}
+        ${product.originalPrice ? `<span class="old-price">${formatCurrency(product.originalPrice)}</span>` : ''}
       </div>
       <button class="add-to-cart btn-primary" onclick="addRelatedToCart(${product.id})">
         Add to Cart
       </button>
     </div>
   `;
-  
+
   return card;
 }
 
@@ -693,15 +681,15 @@ function createRelatedProductCard(product) {
 function addRelatedToCart(productId) {
   const product = getProductById(productId);
   if (!product) return;
-  
+
   if (product.stock === 0) {
     showNotification('This item is out of stock', 'error');
     return;
   }
-  
+
   const cart = getCart();
   const existingItem = cart.find(item => item.id === product.id);
-  
+
   if (existingItem) {
     if (existingItem.quantity < product.stock) {
       existingItem.quantity++;
@@ -716,7 +704,7 @@ function addRelatedToCart(productId) {
     saveCart(cart);
     showNotification(`${product.name} added to cart`, 'success');
   }
-  
+
   updateCartCount();
 }
 

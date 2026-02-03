@@ -1,11 +1,9 @@
-// products-data.js - Complete product database
-
 const products = [
   {
     id: 1,
     name: "iPhone 15 Pro Max",
     price: 1299999,
-    originalPrice: 1499999,
+    // originalPrice: 1499999,
     category: "electronics",
     brand: "Apple",
     rating: 4.8,
@@ -209,6 +207,203 @@ const products = [
     stock: 34,
     isNewArrival: true,
     isTopSeller: true
+  },
+  {
+    id: 9,
+    name: "Apple Watch Series 9",
+    price: 599999,
+    category: "electronics",
+    brand: "Apple",
+    rating: 4.6,
+    reviews: 214,
+    image: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=400&h=400&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=400&h=400&fit=crop"
+    ],
+    description: "Advanced smartwatch with health tracking, fitness insights, and always-on Retina display.",
+    specifications: {
+      "Display": "Always-On Retina",
+      "Health": "ECG, Blood Oxygen",
+      "Connectivity": "GPS + Cellular",
+      "Battery": "18 hours",
+      "Color": "Midnight"
+    },
+    inStock: true,
+    stock: 40,
+    isNewArrival: true,
+    isTopSeller: true
+  },
+  {
+    id: 10,
+    name: "Dell XPS 15",
+    price: 1899999,
+    category: "electronics",
+    brand: "Dell",
+    rating: 4.7,
+    reviews: 132,
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop"
+    ],
+    description: "Premium Windows laptop with InfinityEdge display and powerful performance.",
+    specifications: {
+      "Processor": "Intel Core i7",
+      "Memory": "16GB RAM",
+      "Storage": "1TB SSD",
+      "Display": "15.6-inch 4K UHD",
+      "Color": "Silver"
+    },
+    inStock: true,
+    stock: 15,
+    isTopSeller: true
+  },
+  {
+    id: 11,
+    name: "ADIDAS VultRun M MEN",
+    price: 101900,
+    category: "fashion",
+    brand: "Adidas",
+    rating: "4.6",
+    reviews: 175,
+    image: "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/96/9049472/1.jpg?8225",
+    description: "High-performance running shoes with responsive Boost cushioning.",
+    specifications: {
+      "SKU": "AD002FS4WRPBNNAFAMZ",
+      "Product Line": "Adidas Official Store",
+      "Model": "GB1777",
+      "Weight (kg)": "0.8",
+      "Color": "Blue",
+      "Main Material": "TEXTILE/SYNTHETICS",
+      "Shop Type": "Jumia Mall"
+    },
+    inStock: true,
+    stock: 60,
+    isFlashSale: true,
+    flashPrice: 37267
+  },
+  {
+    id: 12,
+    name: "Canon Ink Cart Eos Canon1100D Camera With 18 - 55mm Lens",
+    price: 300000,
+    category: "electronics",
+    brand: " Canon Ink Cart ",
+    rating: "3/5",
+    reviews: 1,
+    image: "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/10/2900433/1.jpg?2690",
+    description: "A reliable entry-level DSLR kit that captures sharp photos and smooth videos, perfect for beginners and everyday shooting.",
+    specifications: {
+      "SKU": "CA587CM54QLBVNAFAMZ",
+      "Product Line": "Endy Best",
+      "Model": "1100D",
+      "Weight (kg)": 5,
+      "Color": "Black"
+    },
+    inStock: true,
+    stock: 10,
+    isTopSeller: true
+  },
+  {
+    id: 13,
+    name: "Logitech MX Master 3S Mouse",
+    price: 89999,
+    category: "electronics",
+    brand: "Logitech",
+    rating: 4.7,
+    reviews: 421,
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop"
+    ],
+    description: "Advanced wireless mouse with ultra-fast scrolling and ergonomic design.",
+    specifications: {
+      "Connectivity": "Bluetooth / USB Receiver",
+      "Battery": "Up to 70 days",
+      "Sensor": "8000 DPI",
+      "Compatibility": "Windows & macOS",
+      "Color": "Graphite"
+    },
+    inStock: true,
+    stock: 55,
+    isTopSeller: true
+  },
+  {
+    id: 14,
+    name: "JBL Charge 5 Bluetooth Speaker",
+    price: 159999,
+    category: "electronics",
+    brand: "JBL",
+    rating: 4.5,
+    reviews: 384,
+    image: "https://images.unsplash.com/photo-1612441804231-77a36b284856?w=400&h=400&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1612441804231-77a36b284856?w=400&h=400&fit=crop"
+    ],
+    description: "Portable Bluetooth speaker with powerful sound and long battery life.",
+    specifications: {
+      "Battery Life": "20 hours",
+      "Waterproof": "IP67",
+      "Connectivity": "Bluetooth",
+      "Powerbank": "Yes",
+      "Color": "Black"
+    },
+    inStock: true,
+    stock: 70,
+    isFlashSale: true,
+    flashPrice: 139999
+  },
+  {
+    id: 15,
+    name: "NIVEA Sun UV Sunscreen Face Shine Control Cream SPF 50 - 50ml",
+    price: 21840,
+    category: "beauty",
+    brand: "NIVEA",
+    rating: 4.4,
+    reviews: 411,
+    image: "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/04/3634404/1.jpg?2636",
+    images: [
+      "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/04/3634404/2.jpg?2618",
+      "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/04/3634404/3.jpg?2618",
+      "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/04/3634404/5.jpg?2618",
+      "https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/04/3634404/7.jpg?2618"
+    ],
+    description: "NIVEA Sun UV Face Shine Control SPF 50 provides powerful UVA/UVB protection with a lightweight, non-greasy formula that keeps your skin matte and shine-free all day.",
+    specifications: {
+      "SKU": "NI930ST7C1C08NAFAMZ",
+      "Weight (kg)": "1",
+      "Shop Type": "Luxora Mall"
+    },
+    inStock: true,
+    stock: 70,
+    isFlashSale: true,
+    flashPrice: 16578
+  },
+  {
+    id: 16,
+    name: "BAMBOO COOL Men's Ultra Breathable Underwear,No Riding Up Boxer Briefs with ComfortFlexible Waistband,Multipack",
+    price: 51651,
+    category: "fashion",
+    brand: "Bamboo Cool",
+    rating: 4.5,
+    reviews: 15456,
+    image: "https://m.media-amazon.com/images/I/71juzQ+JLzL._AC_SX679_.jpg",
+    images: [
+      "https://m.media-amazon.com/images/I/81sxMqaXKUL._AC_SX679_.jpg",
+      "https://m.media-amazon.com/images/I/711MqAgQzBL._AC_SX679_.jpg",
+      "https://m.media-amazon.com/images/I/91KLGzWEd4L._AC_SX679_.jpg"
+    ],
+    description: "BAMBOO COOL Men's Boxer Briefs (4-Pack) experience all-day comfort with these ultra-breathable men's boxer briefs made from soft, moisture-wicking fabric. Designed to prevent riding up, they feature a flexible waistband that stays secure without digging in. Lightweight, stretchy, and durable—perfect for everyday wear, work, or workouts.",
+    specifications: {
+      "SKU": "FA203MW2WP9H9NAFAMZ",
+      "Model": "Underwear",
+      "Weight (kg)": "0.2",
+      "Color": "multicolor",
+      "Main Material": "92% viscose made from bamboo, 8% spandex",
+      "Care Label": "washable"
+    },
+    inStock: true,
+    stock: 659,
+    isFlashSale: true,
+    flashPrice: 43900
   }
 ];
 

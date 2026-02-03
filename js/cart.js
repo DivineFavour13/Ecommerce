@@ -1,5 +1,3 @@
-// cart.js - Shopping cart functionality
-
 document.addEventListener('DOMContentLoaded', () => {
   initializeCartPage();
 });
@@ -14,7 +12,7 @@ function initializeCartPage() {
   setupPromoCode();
 }
 
-// Load and render cart items
+// FIXED: Show empty cart instead of redirecting
 function loadCartItems() {
   const cart = getCart();
   const cartItemsContainer = document.getElementById('cart-items');
@@ -22,10 +20,9 @@ function loadCartItems() {
   const cartContent = document.querySelector('.cart-content');
   
   if (cart.length === 0) {
-    showNotification('Your cart is empty', 'warning');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 2000);
+    // FIXED: Show empty cart state instead of redirecting
+    if (emptyCartSection) emptyCartSection.style.display = 'block';
+    if (cartContent) cartContent.style.display = 'none';
     return;
   }
   
@@ -43,18 +40,8 @@ function loadCartItems() {
   updateCartSummary();
 }
 
-// Show empty cart
-function showEmptyCart() {
-  const emptyCartSection = document.getElementById('empty-cart');
-  const cartContent = document.querySelector('.cart-content');
-  
-  if (emptyCartSection) emptyCartSection.style.display = 'block';
-  if (cartContent) cartContent.style.display = 'none';
-}
-
-// Create cart item element
 function createCartItemElement(item) {
-  const discount = item.oldPrice ? Math.round(100 - (item.price / item.oldPrice) * 100) : 0;
+  const discount = item.originalPrice ? Math.round(100 - (item.price / item.originalPrice) * 100) : 0;
   const itemTotal = item.price * item.quantity;
   
   const cartItem = document.createElement('div');
@@ -75,7 +62,7 @@ function createCartItemElement(item) {
       </div>
       <div class="cart-item-price">
         ${formatCurrency(item.price)}
-        ${item.oldPrice ? `<span class="cart-item-old-price">${formatCurrency(item.oldPrice)}</span>` : ''}
+        ${item.originalPrice ? `<span class="cart-item-old-price">${formatCurrency(item.originalPrice)}</span>` : ''}
         ${discount > 0 ? `<span class="discount-info">${discount}% off</span>` : ''}
       </div>
     </div>
@@ -103,7 +90,6 @@ function createCartItemElement(item) {
   return cartItem;
 }
 
-// Update item quantity
 function updateItemQuantity(productId, newQuantity) {
   newQuantity = parseInt(newQuantity);
   
@@ -119,7 +105,6 @@ function updateItemQuantity(productId, newQuantity) {
   }
   
   if (updateCartQuantity(productId, newQuantity)) {
-    // Add update animation
     const cartItem = document.querySelector(`[data-id="${productId}"]`);
     if (cartItem) {
       cartItem.classList.add('updated');
@@ -132,7 +117,6 @@ function updateItemQuantity(productId, newQuantity) {
   }
 }
 
-// Remove cart item
 function removeCartItem(productId) {
   if (confirm('Are you sure you want to remove this item from your cart?')) {
     if (removeFromCart(productId)) {
@@ -143,9 +127,7 @@ function removeCartItem(productId) {
   }
 }
 
-// Setup cart event listeners
 function setupCartEventListeners() {
-  // Clear cart button
   const clearCartBtn = document.getElementById('clear-cart');
   if (clearCartBtn) {
     clearCartBtn.addEventListener('click', () => {
@@ -158,14 +140,12 @@ function setupCartEventListeners() {
     });
   }
   
-  // Checkout button
   const checkoutBtn = document.getElementById('checkout-btn');
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', handleCheckout);
   }
 }
 
-// Handle checkout
 function handleCheckout() {
   const cart = getCart();
   const user = getCurrentUser();
@@ -194,22 +174,17 @@ function handleCheckout() {
   }
   
   if (stockError) {
-    loadCartItems(); // Refresh cart to show current stock
+    loadCartItems();
     return;
   }
   
-  // Create order
   const order = createOrderFromCart();
   if (order) {
-    // Update product stocks
     updateProductStocks(cart);
-    
-    // Clear cart
     clearCart();
     
     showNotification(`Order #${order.id} placed successfully!`, 'success');
     
-    // Redirect to order confirmation or home
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 2000);
@@ -218,7 +193,6 @@ function handleCheckout() {
   }
 }
 
-// Create order from cart
 function createOrderFromCart() {
   const cart = getCart();
   const user = getCurrentUser();
@@ -237,15 +211,14 @@ function createOrderFromCart() {
     shipping: calculateShipping(),
     discount: calculateDiscount(),
     total: calculateTotal(),
-    paymentMethod: 'card', // Default payment method
-    shippingAddress: 'Default Address', // In real app, this would be from user profile
+    paymentMethod: 'card',
+    shippingAddress: 'Default Address',
     orderDate: new Date().toISOString()
   };
   
   return createOrder(orderData);
 }
 
-// Update product stocks after order
 function updateProductStocks(cart) {
   cart.forEach(item => {
     const product = getProductById(item.id);
@@ -255,7 +228,6 @@ function updateProductStocks(cart) {
   });
 }
 
-// Update cart summary
 function updateCartSummary() {
   const cart = getCart();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -264,46 +236,44 @@ function updateCartSummary() {
   const discount = calculateDiscount();
   const total = calculateTotal();
   
-  // Update summary elements
   updateElement('summary-items', itemCount);
   updateElement('summary-subtotal', formatCurrency(subtotal));
   updateElement('summary-shipping', formatCurrency(shipping));
   updateElement('summary-discount', formatCurrency(discount));
   updateElement('summary-total', formatCurrency(total));
   
-  // Show/hide discount row
   const discountRow = document.getElementById('discount-row');
   if (discountRow) {
     discountRow.style.display = discount > 0 ? 'flex' : 'none';
   }
   
-  // Enable/disable checkout button
   const checkoutBtn = document.getElementById('checkout-btn');
   if (checkoutBtn) {
     checkoutBtn.disabled = cart.length === 0;
   }
 }
 
-// Calculate subtotal
 function calculateSubtotal() {
   const cart = getCart();
   return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 }
 
-// Calculate shipping
 function calculateShipping() {
   const subtotal = calculateSubtotal();
   
-  // Free shipping over 100,000
+  // FIXED: Respect free-shipping promo codes
+  const appliedPromo = getAppliedPromoCode();
+  if (appliedPromo && appliedPromo.type === 'shipping') {
+    return 0;
+  }
+  
   if (subtotal >= 100000) {
     return 0;
   }
   
-  // Standard shipping
   return 2500;
 }
 
-// Calculate discount
 function calculateDiscount() {
   const appliedPromo = getAppliedPromoCode();
   if (!appliedPromo) return 0;
@@ -315,12 +285,14 @@ function calculateDiscount() {
       return Math.min(subtotal * (appliedPromo.value / 100), appliedPromo.maxDiscount || Infinity);
     case 'fixed':
       return Math.min(appliedPromo.value, subtotal);
+    case 'shipping':
+      // shipping-type promo does not reduce subtotal; handled by calculateShipping
+      return 0;
     default:
       return 0;
   }
 }
 
-// Calculate total
 function calculateTotal() {
   const subtotal = calculateSubtotal();
   const shipping = calculateShipping();
@@ -329,7 +301,6 @@ function calculateTotal() {
   return Math.max(0, subtotal + shipping - discount);
 }
 
-// Setup promo code functionality
 function setupPromoCode() {
   const promoForm = document.getElementById('promo-form');
   if (promoForm) {
@@ -346,7 +317,6 @@ function setupPromoCode() {
   }
 }
 
-// Apply promo code
 function applyPromoCode(code) {
   const promoCodes = getPromoCodes();
   const promo = promoCodes.find(p => p.code === code && p.active);
@@ -361,17 +331,14 @@ function applyPromoCode(code) {
     return;
   }
   
-  // Apply promo code
   localStorage.setItem('applied_promo', JSON.stringify(promo));
   
-  // Update UI
   updateCartSummary();
   showPromoSuccess(promo);
   
   showNotification(`Promo code "${code}" applied successfully!`, 'success');
 }
 
-// Show promo success
 function showPromoSuccess(promo) {
   const promoInput = document.getElementById('promo-code');
   const promoButton = promoInput.nextElementSibling;
@@ -382,7 +349,6 @@ function showPromoSuccess(promo) {
   promoButton.disabled = true;
   promoButton.style.backgroundColor = '#28a745';
   
-  // Add success message
   const existingSuccess = document.querySelector('.promo-success');
   if (existingSuccess) existingSuccess.remove();
   
@@ -393,7 +359,6 @@ function showPromoSuccess(promo) {
   promoInput.parentElement.appendChild(successMsg);
 }
 
-// Get applied promo code
 function getAppliedPromoCode() {
   try {
     const applied = localStorage.getItem('applied_promo');
@@ -403,7 +368,6 @@ function getAppliedPromoCode() {
   }
 }
 
-// Get available promo codes (demo data)
 function getPromoCodes() {
   return [
     {
@@ -434,7 +398,6 @@ function getPromoCodes() {
   ];
 }
 
-// Load recently viewed products
 function loadRecentlyViewed() {
   const recentlyViewedSection = document.getElementById('recently-viewed');
   const recentlyViewedGrid = document.getElementById('recently-viewed-grid');
@@ -444,15 +407,14 @@ function loadRecentlyViewed() {
   const recentlyViewed = getRecentlyViewed();
   
   if (recentlyViewed.length === 0) {
-    recentlyViewedSection.style.display = 'none';
+    if (recentlyViewedSection) recentlyViewedSection.style.display = 'none';
     return;
   }
   
-  recentlyViewedSection.style.display = 'block';
+  if (recentlyViewedSection) recentlyViewedSection.style.display = 'block';
   renderProductsInGrid(recentlyViewedGrid, recentlyViewed.slice(0, 6));
 }
 
-// Load recommended products
 function loadRecommendedProducts() {
   const recommendedGrid = document.getElementById('recommended-grid');
   if (!recommendedGrid) return;
@@ -460,17 +422,14 @@ function loadRecommendedProducts() {
   const cart = getCart();
   const allProducts = getProducts();
   
-  // Get categories from cart items
   const cartCategories = [...new Set(cart.map(item => item.category))];
   
-  // Filter products by cart categories (excluding items already in cart)
   const cartProductIds = cart.map(item => item.id);
   let recommended = allProducts.filter(product => 
     cartCategories.includes(product.category) && 
     !cartProductIds.includes(product.id)
   );
   
-  // If not enough, add random products
   if (recommended.length < 6) {
     const additional = allProducts
       .filter(product => !cartProductIds.includes(product.id) && !recommended.includes(product))
@@ -482,7 +441,6 @@ function loadRecommendedProducts() {
   renderProductsInGrid(recommendedGrid, recommended.slice(0, 6));
 }
 
-// Render products in grid
 function renderProductsInGrid(container, products) {
   container.innerHTML = '';
   
@@ -492,9 +450,8 @@ function renderProductsInGrid(container, products) {
   });
 }
 
-// Create recommended product card
 function createRecommendedProductCard(product) {
-  const discount = product.oldPrice ? Math.round(100 - (product.price / product.oldPrice) * 100) : 0;
+  const discount = product.originalPrice ? Math.round(100 - (product.price / product.originalPrice) * 100) : 0;
   
   const card = document.createElement('div');
   card.className = 'product-card';
@@ -510,7 +467,7 @@ function createRecommendedProductCard(product) {
       <h3><a href="product.html?id=${product.id}">${product.name}</a></h3>
       <div class="price">
         ${formatCurrency(product.price)}
-        ${product.oldPrice ? `<span class="old-price">${formatCurrency(product.oldPrice)}</span>` : ''}
+        ${product.originalPrice ? `<span class="old-price">${formatCurrency(product.originalPrice)}</span>` : ''}
       </div>
       <button class="add-to-cart btn-primary" onclick="addRecommendedToCart(${product.id})">
         Add to Cart
@@ -521,7 +478,6 @@ function createRecommendedProductCard(product) {
   return card;
 }
 
-// Add recommended product to cart
 function addRecommendedToCart(productId) {
   const product = getProductById(productId);
   if (!product) return;
@@ -553,7 +509,6 @@ function addRecommendedToCart(productId) {
   updateCartCount();
 }
 
-// Utility function to update element text content
 function updateElement(id, content) {
   const element = document.getElementById(id);
   if (element) {
@@ -561,11 +516,8 @@ function updateElement(id, content) {
   }
 }
 
-// Initialize on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeCartPage);
-} else {
-  initializeCartPage();
+function formatCurrency(amount) {
+  return '₦' + amount.toLocaleString();
 }
 
 // Expose functions for onclick handlers

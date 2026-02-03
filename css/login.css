@@ -1,7 +1,7 @@
 /* =============== LOGIN PAGE STYLES =============== */
 
 .login-container {
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - var(--header-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,8 +10,8 @@
 }
 
 .login-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-xl);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   padding: 3rem 2.5rem;
   width: 100%;
@@ -27,7 +27,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #FF6B35 0%, #e55a2e 100%);
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-hover) 100%);
 }
 
 .login-header {
@@ -36,29 +36,33 @@
 }
 
 .login-header h2 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .login-header p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 1rem;
   margin: 0;
 }
 
 .auth-form {
   margin-bottom: 1.5rem;
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .form-group {
   margin-bottom: 1.5rem;
+  transition: var(--transition-base);
 }
 
 .form-group label {
   display: block;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
@@ -73,30 +77,36 @@
 .input-group i {
   position: absolute;
   left: 1rem;
-  color: #999;
+  color: var(--text-muted);
   z-index: 2;
   font-size: 1rem;
+  transition: color 0.3s ease;
 }
 
 .input-group input {
   padding-left: 3rem;
   padding-right: 3rem;
   height: 50px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
+  transition: var(--transition-base);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
 }
 
 .input-group input:focus {
-  background: white;
-  border-color: #FF6B35;
+  background: var(--bg-primary);
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
 .input-group input:focus + i {
-  color: #FF6B35;
+  color: var(--primary-color);
 }
 
 .password-toggle {
@@ -104,15 +114,22 @@
   right: 1rem;
   background: none;
   border: none;
-  color: #999;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 0;
   z-index: 2;
   transition: color 0.3s ease;
+  width: auto;
+  height: auto;
 }
 
 .password-toggle:hover {
-  color: #FF6B35;
+  color: var(--primary-color);
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .form-options {
@@ -130,7 +147,8 @@
   gap: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
+  user-select: none;
 }
 
 .remember-me input[type="checkbox"] {
@@ -140,15 +158,16 @@
 .checkmark {
   width: 18px;
   height: 18px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid var(--border-color);
   border-radius: 4px;
   position: relative;
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
+  flex-shrink: 0;
 }
 
 .remember-me input[type="checkbox"]:checked + .checkmark {
-  background-color: #FF6B35;
-  border-color: #FF6B35;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .remember-me input[type="checkbox"]:checked + .checkmark::after {
@@ -164,7 +183,7 @@
 }
 
 .forgot-password {
-  color: #FF6B35;
+  color: var(--primary-color);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
@@ -172,7 +191,7 @@
 }
 
 .forgot-password:hover {
-  color: #e55a2e;
+  color: var(--primary-hover);
   text-decoration: underline;
 }
 
@@ -183,24 +202,24 @@
 .form-footer {
   text-align: center;
   padding: 1.5rem 0 1rem;
-  border-top: 1px solid #e1e5e9;
+  border-top: 1px solid var(--border-color);
 }
 
 .form-footer p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   margin: 0;
 }
 
 .form-footer a {
-  color: #FF6B35;
+  color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .form-footer a:hover {
-  color: #e55a2e;
+  color: var(--primary-hover);
   text-decoration: underline;
 }
 
@@ -210,8 +229,9 @@
   gap: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.4;
+  user-select: none;
 }
 
 .terms-agreement input[type="checkbox"] {
@@ -224,7 +244,7 @@
 }
 
 .terms-agreement a {
-  color: #FF6B35;
+  color: var(--primary-color);
   text-decoration: none;
 }
 
@@ -233,28 +253,36 @@
 }
 
 .demo-info {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, #e9ecef 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   padding: 1rem;
   margin-top: 1rem;
   text-align: center;
+  transition: var(--transition-base);
+}
+
+.demo-info:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .demo-info p {
   margin: 0.25rem 0;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .demo-info p:first-child {
-  color: #FF6B35;
+  color: var(--primary-color);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
 .demo-info i {
-  color: #FF6B35;
+  color: var(--primary-color);
   margin-right: 0.25rem;
 }
 
@@ -275,12 +303,12 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: #e1e5e9;
+  background: var(--border-color);
 }
 
 .divider span {
-  background: white;
-  color: #999;
+  background: var(--bg-primary);
+  color: var(--text-muted);
   padding: 0 1rem;
   font-size: 0.9rem;
   position: relative;
@@ -293,14 +321,14 @@
 
 .social-btn {
   flex: 1;
-  background: white;
-  border: 2px solid #e1e5e9;
-  color: #666;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  color: var(--text-secondary);
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,8 +336,8 @@
 }
 
 .social-btn:hover {
-  border-color: #FF6B35;
-  color: #FF6B35;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -324,78 +352,52 @@
   color: #3b5998;
 }
 
-/* Loading State */
-.auth-form.loading .btn-text {
-  display: none;
-}
+/* =============== FORM STATES =============== */
 
-.auth-form.loading .btn-loading {
-  display: inline-block;
-}
-
-.auth-form.loading .btn-primary {
-  pointer-events: none;
-  opacity: 0.7;
-}
-
-/* Error States */
 .form-group.error input {
-  border-color: #dc3545;
+  border-color: var(--danger-color);
   background-color: #fff5f5;
 }
 
 .form-group.error .input-group i {
-  color: #dc3545;
+  color: var(--danger-color);
 }
 
 .error-message {
-  color: #dc3545;
+  color: var(--danger-color);
   font-size: 0.8rem;
   margin-top: 0.25rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  animation: slideIn 0.3s ease;
 }
 
 .error-message i {
   font-size: 0.7rem;
 }
 
-/* Success States */
 .form-group.success input {
-  border-color: #28a745;
+  border-color: var(--success-color);
   background-color: #f8fff9;
 }
 
 .form-group.success .input-group i {
-  color: #28a745;
+  color: var(--success-color);
 }
 
 .success-message {
-  color: #28a745;
+  color: var(--success-color);
   font-size: 0.8rem;
   margin-top: 0.25rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  animation: slideIn 0.3s ease;
 }
 
-/* Animation for form switching */
-.auth-form {
-  transition: all 0.3s ease;
-}
+/* =============== RESPONSIVE DESIGN =============== */
 
-.auth-form.fade-out {
-  opacity: 0;
-  transform: translateX(-20px);
-}
-
-.auth-form.fade-in {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* Responsive Design */
 @media (max-width: 480px) {
   .login-container {
     padding: 1rem 0.5rem;
@@ -429,7 +431,8 @@
   }
 }
 
-/* Dark mode support */
+/* =============== DARK MODE SUPPORT =============== */
+
 @media (prefers-color-scheme: dark) {
   .login-container {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);

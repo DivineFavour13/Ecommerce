@@ -1,28 +1,29 @@
 /* =============== NOTIFICATION SYSTEM STYLES =============== */
+/* Uses CSS variables from style.css */
 
 .notification-container {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 10000;
+  z-index: 1400; /* Updated: Consistent z-index scale */
   max-width: 400px;
 }
 
 .notification {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-medium);
   margin-bottom: 10px;
   overflow: hidden;
   animation: slideInRight 0.3s ease-out;
 }
 
 .notification-success {
-  border-left: 4px solid #28a745;
+  border-left: 4px solid var(--success);
 }
 
 .notification-error {
-  border-left: 4px solid #dc3545;
+  border-left: 4px solid var(--danger);
 }
 
 .notification-warning {
@@ -45,11 +46,11 @@
 }
 
 .notification-success i:first-child {
-  color: #28a745;
+  color: var(--success);
 }
 
 .notification-error i:first-child {
-  color: #dc3545;
+  color: var(--danger);
 }
 
 .notification-warning i:first-child {
@@ -71,12 +72,12 @@
   border: none;
   cursor: pointer;
   padding: 5px;
-  color: #666;
+  color: var(--text-secondary);
   transition: color 0.3s ease;
 }
 
 .notification-close:hover {
-  color: #333;
+  color: var(--text-primary);
 }
 
 @keyframes slideInRight {
