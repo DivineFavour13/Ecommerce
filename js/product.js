@@ -191,18 +191,24 @@ function renderProductDetails(product) {
   }
 }
 
-// Generate additional images (mock for demo)
+// Generate additional images (uses product.images array directly)
 function generateAdditionalImages(product) {
-  // In a real app, these would come from the product data
-  const additionalImages = (product.images && product.images.length > 1)
-    ? product.images.slice(1)
-    : [
-      product.image.replace('.jpg', '_2.jpg'),
-      product.image.replace('.jpg', '_3.jpg'),
-      product.image.replace('.jpg', '_4.jpg')
-    ];
+  let imagesToUse = [];
 
-  return additionalImages.map(img => `
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    imagesToUse = product.images.slice();
+  } else if (typeof product.image === 'string') {
+    const base = product.image;
+    imagesToUse = [
+      base.replace(/\.jpg/i, '_2.jpg'),
+      base.replace(/\.jpg/i, '_3.jpg'),
+      base.replace(/\.jpg/i, '_4.jpg')
+    ];
+  }
+
+  const deduped = imagesToUse.filter(img => img !== product.image);
+
+  return deduped.slice(0, 5).map(img => `
     <div class="thumbnail">
       <img src="${img}" alt="${product.name}" onerror="this.style.display='none'">
     </div>

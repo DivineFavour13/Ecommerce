@@ -3,34 +3,42 @@
 /* =============== HERO SECTION =============== */
 
 .hero-section {
-  background-color: transparent; /* separate cards instead of one big container */
   margin: 2rem auto;
   max-width: 1200px;
+  padding: 1rem 0;
 }
 
 .hero-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 250px 1fr 280px; /* Three columns: Categories | Banner+QuickLinks | Luxora */
+  grid-template-rows: 300px auto;
   gap: 1rem;
   padding: 1rem;
-  align-items: flex-start; /* prevent children from stretching vertically */
-  /* min-height removed to allow banner container to size to its content */
+  align-items: start; 
+  justify-content: stretch;
 }
 
 .hero-categories {
-  flex: 1;
-  background-color: #2d2d2d;
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  max-width: 250px;
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  background-color: #232323;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 90px;
+  height: fit-content;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
 }
 
 .hero-categories h3 {
-  color: #ffffff;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  padding: 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .hero-categories ul {
@@ -69,43 +77,34 @@
   color: var(--primary-color);
 }
 
-/* Hero Banner - FIXED: Removed fixed aspect-ratio to eliminate extra white space */
+/* Hero Banner */
 .hero-banner {
-  flex: none;
-  width: 60%;
-  margin: 0 auto;
-  align-self: flex-start; /* do not stretch to tallest column */
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  width: 100%;
   position: relative;
-  border-radius: var(--border-radius);
+  border-radius: 12px;
   overflow: hidden;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
-  /* REMOVED: aspect-ratio: 16 / 6; */
-  /* REMOVED: height: auto; */
+  box-shadow: 0 12px 30px rgba(16, 24, 40, 0.06);
+  height: 300px;
 }
 
 .slider {
   position: relative;
   width: 100%;
-  height: auto;
-  /* REMOVED: aspect-ratio: 16 / 6; */
-  display: flex;
-  align-items: stretch;
+  height: 100%;
 }
 
 .slide {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   opacity: 0;
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.45s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   text-align: center;
 }
 
@@ -116,7 +115,7 @@
 .slide-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* CHANGED from contain to cover to fill the space */
+  object-fit: cover;
   object-position: center;
   display: block;
 }
@@ -161,12 +160,12 @@
   transform: translateX(-50%);
   display: flex;
   gap: 10px;
-  z-index: 2;
+  z-index: 3;
 }
 
 .indicator {
-  width: 15px;
-  height: 15px;
+  width: 10px;
+  height: 10px;
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   cursor: pointer;
@@ -177,45 +176,43 @@
   background-color: #ff4d4d;
 }
 
-/* Quick Links */
+/* Quick Links - Now below banner */
 .hero-quicklinks {
-  flex: 1;
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
   display: flex;
-  flex-direction: column;
   gap: 0.75rem;
-  max-width: 200px;
-  background: transparent; /* let items stand out as separate cards */
-  border: none;
-  border-radius: 0;
-  padding: 0; /* rely on item spacing */
-  box-shadow: none;
+  align-items: stretch;
+  justify-content: space-between;
+  padding-top: 0;
 }
 
 .quicklink {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   background: var(--bg-primary);
   padding: 1rem;
-  border-radius: var(--border-radius);
+  border-radius: 10px;
   border: 1px solid var(--border-color);
-  transition: var(--transition-base);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 70px;
-  text-align: left;
-  width: 100%;
-  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  min-height: 110px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(16,24,40,0.05);
 }
 
 .quicklink:hover {
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(16,24,40,0.12);
   border-color: var(--primary-color);
 }
 
 .quicklink.orange {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-  color: white;
+  color: #fff;
   border-color: var(--primary-color);
 }
 
@@ -226,45 +223,135 @@
 .quicklink i {
   font-size: 1.2rem;
   color: var(--primary-color);
-  width: 20px;
-  text-align: center;
+  display: block;
 }
 
 .quicklink.orange i {
   color: white;
 }
 
-.quicklink div {
-  flex: 1;
-}
-
 .quicklink strong {
   display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0;
 }
 
-.quicklink p {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.3;
-}
-
-.quicklink.orange strong {
-  color: white;
-}
-
-.quicklink.orange p {
-  color: rgba(255, 255, 255, 0.95);
-}
-
+.quicklink p,
 .quicklink a {
-  color: inherit;
-  font-weight: 600;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* NEW: Luxora Animation Section */
+.hero-luxora-animation {
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-luxora-animation::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 107, 53, 0.05) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.luxora-logo-jump {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--primary-color);
+  letter-spacing: 2px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: jump 3s ease-in-out infinite;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes jump {
+  0%, 90% {
+    transform: translateY(0);
+  }
+  5% {
+    transform: translateY(-20px);
+  }
+  10% {
+    transform: translateY(0);
+  }
+}
+
+.luxora-tagline {
+  margin-top: 1.5rem;
   font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.luxora-features {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.luxora-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.luxora-feature:hover {
+  transform: translateX(5px);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
+}
+
+.luxora-feature i {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  min-width: 20px;
+}
+
+.luxora-feature span {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 /* =============== FLASH SALES SECTION =============== */
@@ -791,48 +878,90 @@
 
 @media (max-width: 1024px) {
   .hero-container {
-    flex-direction: column;
-    min-height: auto;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: auto auto auto;
   }
 
   .hero-categories {
-    max-width: 100%;
-    order: 3;
+    grid-column: 1 / 2;
+    grid-row: 1 / 4;
   }
 
   .hero-banner {
-    order: 1;
-    min-height: auto;
-    width: 100%;
-    margin: 0;
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
   }
 
   .hero-quicklinks {
-    order: 2;
-    max-width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+  }
+
+  .hero-luxora-animation {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+    padding: 1.5rem;
+    min-height: 200px;
+  }
+
+  .luxora-logo-jump {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+
+  .hero-categories {
+    position: relative;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    max-height: none;
+  }
+
+  .hero-banner {
+    width: 100%;
+    height: 220px;
+    max-width: none;
+  }
+
+  .hero-quicklinks {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    justify-content: flex-start;
   }
 
   .quicklink {
-    flex: 1;
     min-width: 200px;
+    flex: 0 0 200px;
+  }
+
+  .hero-luxora-animation {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .luxora-features {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .luxora-feature {
+    flex: 0 0 calc(50% - 0.375rem);
   }
 }
 
 @media (max-width: 768px) {
   .hero-container {
     padding: 0.5rem;
-  }
-  
-  .hero-categories {
-    order: 2;
-  }
-  
-  .hero-quicklinks {
-    order: 3;
-    flex-direction: column;
   }
   
   .slide-content h2 {
@@ -874,6 +1003,18 @@
   
   .flash-sale-item .product-image {
     height: 140px;
+  }
+
+  .luxora-logo-jump {
+    font-size: 2rem;
+  }
+
+  .luxora-features {
+    flex-direction: column;
+  }
+
+  .luxora-feature {
+    flex: 1 1 auto;
   }
 }
 
@@ -942,6 +1083,14 @@
   
   .flash-sale-item .product-image {
     height: 120px;
+  }
+
+  .luxora-logo-jump {
+    font-size: 1.8rem;
+  }
+
+  .hero-luxora-animation {
+    padding: 1rem;
   }
 }
 

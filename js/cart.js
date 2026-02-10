@@ -14,29 +14,38 @@ function initializeCartPage() {
 
 // FIXED: Show empty cart instead of redirecting
 function loadCartItems() {
-  const cart = getCart();
+  let cart = getCart();
+
+  // Filter out invalid cart items (missing or invalid price)
+  cart = cart.filter(item => typeof item.price === 'number' && !isNaN(item.price));
+
+  // Update cart in storage if items were filtered out
+  if (cart.length !== getCart().length) {
+    saveCart(cart);
+  }
+
   const cartItemsContainer = document.getElementById('cart-items');
   const emptyCartSection = document.getElementById('empty-cart');
   const cartContent = document.querySelector('.cart-content');
-  
+
   if (cart.length === 0) {
     // FIXED: Show empty cart state instead of redirecting
     if (emptyCartSection) emptyCartSection.style.display = 'block';
     if (cartContent) cartContent.style.display = 'none';
     return;
   }
-  
+
   // Hide empty cart and show content
   if (emptyCartSection) emptyCartSection.style.display = 'none';
   if (cartContent) cartContent.style.display = 'flex';
-  
+
   cartItemsContainer.innerHTML = '';
-  
+
   cart.forEach(item => {
     const cartItem = createCartItemElement(item);
     cartItemsContainer.appendChild(cartItem);
   });
-  
+
   updateCartSummary();
 }
 
@@ -517,6 +526,10 @@ function updateElement(id, content) {
 }
 
 function formatCurrency(amount) {
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    console.warn('Invalid amount for currency formatting:', amount);
+    return '₦0';
+  }
   return '₦' + amount.toLocaleString();
 }
 
