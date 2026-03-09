@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shopping Cart | LUXORA</title>
-  <title>Shopping Cart | LUXORA</title>
+  <title>Wishlist | LUXORA</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/cart.css">
+  <link rel="stylesheet" href="css/wishlist.css">
   <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/notifications.css">  <!-- NEW -->
-  <link rel="stylesheet" href="css/modals.css">        <!-- NEW -->
+  <link rel="stylesheet" href="css/notifications.css">
+  <link rel="stylesheet" href="css/modals.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -74,14 +73,14 @@
       <div class="breadcrumb">
         <a href="index.html">Home</a>
         <i class="fas fa-chevron-right"></i>
-        <span>Shopping Cart</span>
+        <span>Wishlist</span>
       </div>
 
-      <div class="cart-header">
-        <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
-        <div class="cart-actions">
-          <button id="clear-cart" class="btn-secondary">
-            <i class="fas fa-trash"></i> Clear Cart
+      <div class="wishlist-header">
+        <h1><i class="fas fa-heart"></i> My Wishlist</h1>
+        <div class="wishlist-actions">
+          <button id="clear-wishlist" class="btn-secondary">
+            <i class="fas fa-trash"></i> Clear Wishlist
           </button>
           <a href="index.html" class="btn-outline">
             <i class="fas fa-arrow-left"></i> Continue Shopping
@@ -89,89 +88,35 @@
         </div>
       </div>
 
-      <div class="cart-content">
-        <div class="cart-items" id="cart-items">
-          <!-- Cart items will be loaded here -->
-        </div>
-
-        <div class="cart-summary">
-          <div class="summary-card">
-            <h3>Order Summary</h3>
-            <div class="summary-row">
-              <span>Subtotal (<span id="summary-items">0</span> items)</span>
-              <span id="summary-subtotal">₦0</span>
-            </div>
-            <div class="summary-row">
-              <span>Shipping</span>
-              <span id="summary-shipping">₦0</span>
-            </div>
-            <div class="summary-row discount-row" id="discount-row" style="display: none;">
-              <span>Discount</span>
-              <span id="summary-discount">-₦0</span>
-            </div>
-            <div class="summary-divider"></div>
-            <div class="summary-row total-row">
-              <span>Total</span>
-              <span id="summary-total">₦0</span>
-            </div>
-            
-            <div class="promo-code">
-              <h4>Promo Code</h4>
-              <form id="promo-form">
-                <div class="promo-input">
-                  <input type="text" id="promo-code" placeholder="Enter promo code">
-                  <button type="submit">Apply</button>
-                </div>
-              </form>
-            </div>
-
-            <button id="checkout-btn" class="btn-primary btn-full">
-              <i class="fas fa-lock"></i> Proceed to Checkout
-            </button>
-
-            <div class="payment-methods">
-              <h4>We Accept</h4>
-              <div class="payment-icons">
-                <i class="fab fa-cc-visa"></i>
-                <i class="fab fa-cc-mastercard"></i>
-                <i class="fab fa-cc-paypal"></i>
-                <i class="fas fa-university"></i>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="wishlist-summary">
+        <span id="wishlist-count">0</span> items saved
       </div>
 
-      <!-- Empty Cart State -->
-      <div class="empty-cart" id="empty-cart" style="display: none;">
-        <div class="empty-cart-content">
-          <i class="fas fa-shopping-cart"></i>
-          <h2>Your cart is empty</h2>
-          <p>Looks like you haven't added any items to your cart yet.</p>
+      <div class="wishlist-grid" id="wishlist-grid">
+        <!-- Wishlist items will be loaded here -->
+      </div>
+
+      <!-- Empty Wishlist State -->
+      <div class="empty-wishlist" id="empty-wishlist" style="display: none;">
+        <div class="empty-wishlist-content">
+          <i class="fas fa-heart"></i>
+          <h2>Your wishlist is empty</h2>
+          <p>Save items you love to find them all in one place.</p>
           <a href="index.html" class="btn-primary">
-            <i class="fas fa-arrow-left"></i> Continue Shopping
+            <i class="fas fa-arrow-left"></i> Start Shopping
           </a>
         </div>
       </div>
 
-      <!-- Recently Viewed -->
-      <section class="recently-viewed" id="recently-viewed">
-        <h2>Recently Viewed</h2>
-        <div class="product-grid" id="recently-viewed-grid">
-          <!-- Recently viewed products will be loaded here -->
-        </div>
-      </section>
-
       <!-- Recommended Products -->
-      <section class="recommended-products">
+      <section class="recommended-products" id="wishlist-recommendations">
         <h2>You Might Also Like</h2>
-        <div class="product-grid" id="recommended-grid">
+        <div class="wishlist-recommended-grid" id="wishlist-recommended-grid">
           <!-- Recommended products will be loaded here -->
         </div>
       </section>
     </div>
   </main>
-
 
   <script src="js/utils.js"></script>
   <script src="js/storage.js"></script>
@@ -179,7 +124,6 @@
   <script src="js/init.js"></script>
   <script src="js/common.js"></script> 
   <script src="js/header.js"></script>
-  <script src="js/cart.js"></script>
-
+  <script src="js/wishlist.js"></script>
 </body>
 </html>

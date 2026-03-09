@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Methods | LUXORA</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/account.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/notifications.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body data-section="payments">
+
+  <header id="main-header">
+    <div class="header-container">
+      <div class="logo">
+        <h2><a href="../index.html">LUXORA</a></h2>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search products, brands and categories...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+      </div>
+      <nav class="header-nav">
+        <a href="../cart.html" id="cart-link" class="cart-link">
+          <i class="fas fa-shopping-cart"></i>
+          Cart (<span id="cart-count">0</span>)
+        </a>
+        <div class="user-dropdown" id="user-dropdown">
+          <button class="user-dropdown-btn" id="user-dropdown-btn">
+            <i class="fas fa-user"></i>
+            <span id="user-name">Account</span>
+            <span class="admin-badge" id="admin-badge" style="display: none;">Admin</span>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdown-menu">
+            <a href="../admin.html" class="dropdown-item" id="admin-link" style="display: none;">
+              <i class="fas fa-tachometer-alt"></i>
+              Admin Panel
+            </a>
+            <a href="../wishlist.html" class="dropdown-item" id="wishlist-link">
+              <i class="fas fa-heart"></i>
+              Wishlist
+            </a>
+            <a href="../account.html" class="dropdown-item" id="account-link">
+              <i class="fas fa-user-cog"></i>
+              Account Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="../login.html" class="dropdown-item" id="login-link">
+              <i class="fas fa-sign-in-alt"></i>
+              Login
+            </a>
+            <a href="#" class="dropdown-item" id="logout-link" style="display: none;">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="../account.html">Account Settings</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Payment Methods</span>
+      </div>
+
+      <div class="account-header">
+        <h1><i class="fas fa-credit-card"></i> Payment Methods</h1>
+        <p class="account-subtitle">Manage your saved cards and default method.</p>
+      </div>
+
+      <div class="account-grid">
+        <aside class="account-nav">
+          <a href="../account.html" class="nav-item" data-section="preferences"><i class="fas fa-sliders-h"></i> Preferences</a>
+          <a href="profile.html" class="nav-item" data-section="profile"><i class="fas fa-user"></i> Profile</a>
+          <a href="security.html" class="nav-item" data-section="security"><i class="fas fa-lock"></i> Security</a>
+          <a href="addresses.html" class="nav-item" data-section="addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+          <a href="payments.html" class="nav-item" data-section="payments"><i class="fas fa-credit-card"></i> Payment Methods</a>
+          <a href="orders.html" class="nav-item" data-section="orders"><i class="fas fa-box"></i> Orders</a>
+        </aside>
+
+        <section class="account-content">
+          <div class="card">
+            <div class="card-header">
+              <h3>Add New Card</h3>
+              <span class="card-hint">Saved locally</span>
+            </div>
+
+            <form id="payment-form">
+              <input type="hidden" id="payment-id">
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label for="card-name">Cardholder Name</label>
+                  <input class="form-control" type="text" id="card-name" required>
+                </div>
+                <div class="form-group full">
+                  <label for="card-number">Card Number</label>
+                  <input class="form-control" type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                </div>
+                <div class="form-group">
+                  <label for="card-exp">Expiry (MM/YY)</label>
+                  <input class="form-control" type="text" id="card-exp" placeholder="08/27" required>
+                </div>
+                <div class="form-group">
+                  <label for="card-cvv">CVV</label>
+                  <input class="form-control" type="password" id="card-cvv" placeholder="***" required>
+                </div>
+                <div class="form-group full">
+                  <label class="inline-row">
+                    <input type="checkbox" id="card-default">
+                    <span>Set as default payment method</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                  <i class="fas fa-save"></i> Save Card
+                </button>
+                <button type="button" id="card-cancel" class="btn-outline">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card" style="margin-top: 1rem;">
+            <div class="card-header">
+              <h3>Saved Cards</h3>
+              <span class="card-hint">Masked</span>
+            </div>
+            <div id="payment-cards" class="payment-cards"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/products-data.js"></script>
+  <script src="../js/init.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/account-nav.js"></script>
+  <script src="../js/account-payments.js"></script>
+</body>
+</html>

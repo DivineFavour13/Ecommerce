@@ -1,0 +1,65 @@
+/* =============== RESPONSIVE DESIGN UTILITIES =============== */
+/* Minimal version - most responsive styles moved to component files */
+
+/* Print Styles */
+@media print {
+  .header-nav,
+  .hero-section,
+  .newsletter-section,
+  footer,
+  .floating-cart,
+  .modal {
+    display: none;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .product-card,
+  .flash-product-card {
+    break-inside: avoid;
+  }
+}
+
+/* High DPI Displays */
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min-resolution: 192dpi) {
+  .logo h2 {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Landscape Orientation */
+@media only screen and (orientation: landscape) and (max-height: 500px) {
+  .hero-banner {
+    min-height: 200px;
+  }
+
+  .slide-content {
+    padding: 1rem;
+  }
+
+  .slide-content h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .slider img {
+    transition: none;
+  }
+
+  .slide {
+    transition: none;
+  }
+}

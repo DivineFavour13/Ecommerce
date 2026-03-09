@@ -1,4 +1,5 @@
 // storage.js - FIXED with password hashing and proper security
+import products from '../data/products-data.js';
 
 // Storage keys
 const PRODUCTS_KEY = 'luxora_products';
@@ -859,3 +860,62 @@ if (typeof window !== 'undefined') {
     initializeStorage();
   }, 50);
 }
+
+export {
+  getProducts,
+  saveProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  getCart,
+  saveCart,
+  addToCart,
+  removeFromCart,
+  updateCartQuantity,
+  clearCart,
+  getCartTotal,
+  getCartItemCount,
+  getCurrentUser,
+  setCurrentUser,
+  setCurrentUserNoRestore,
+  logout,
+  getUsers,
+  saveUsers,
+  addUser,
+  authenticateUser,
+  authenticateUserByPhone,
+  authenticateUserByIdentifier,
+  getWishlist,
+  saveWishlist,
+  addToWishlist,
+  removeFromWishlist,
+  isInWishlist,
+  getRecentlyViewed,
+  saveRecentlyViewed,
+  addToRecentlyViewed,
+  getOrders,
+  saveOrders,
+  createOrder,
+  updateOrderStatus,
+  getSettings,
+  saveSettings,
+  getDefaultSettings,
+  clearAllData,
+  exportData,
+  importData,
+  isStorageAvailable,
+  initializeStorage,
+  getUserPreferences,
+  saveUserPreferences,
+  getUserProfile,
+  saveUserProfile,
+  getUserSecuritySettings,
+  saveUserSecuritySettings,
+  changeUserPassword,
+  getUserLoginHistory,
+  addLoginActivity,
+  getUserAddresses,
+  saveUserAddresses,
+  getUserPayments,
+  saveUserPayments
+};

@@ -44,11 +44,7 @@
               <i class="fas fa-tachometer-alt"></i>
               Admin Panel
             </a>
-            <a href="#" class="dropdown-item" id="orders-link">
-              <i class="fas fa-box"></i>
-              My Orders
-            </a>
-            <a href="#" class="dropdown-item" id="wishlist-link">
+            <a href="wishlist.html" class="dropdown-item" id="wishlist-link">
               <i class="fas fa-heart"></i>
               Wishlist
             </a>
@@ -83,10 +79,10 @@
         <!-- Login Form -->
         <form id="login-form" class="auth-form">
           <div class="form-group">
-            <label for="email">Email Address</label>
+            <label for="email">Email / Phone Number</label>
             <div class="input-group">
-              <i class="fas fa-envelope"></i>
-              <input type="email" id="email" name="email" placeholder="Enter your email" required />
+              <i class="fas fa-user"></i>
+              <input type="text" id="email" name="identifier" placeholder="Enter your email or phone number" required />
             </div>
           </div>
           <div class="form-group">
@@ -114,7 +110,7 @@
           <div class="demo-info">
             <p><i class="fas fa-info-circle"></i> Demo Credentials:</p>
             <p>Admin: admin@luxora.com | User: user@luxora.com</p>
-            <p>Password: Any password works</p>
+            <p>Password: admin123 or user123</p>
           </div>
         </form>
 
@@ -132,6 +128,23 @@
             <div class="input-group">
               <i class="fas fa-envelope"></i>
               <input type="email" id="reg-email" name="email" placeholder="Enter your email" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-phone">Phone Number</label>
+            <div class="input-group phone-group">
+              <select id="reg-country-code" name="country-code" aria-label="Country code" required>
+                <option value="+234">+234 (NG)</option>
+                <option value="+1">+1 (US)</option>
+                <option value="+44">+44 (UK)</option>
+                <option value="+61">+61 (AU)</option>
+                <option value="+91">+91 (IN)</option>
+                <option value="+81">+81 (JP)</option>
+                <option value="+49">+49 (DE)</option>
+                <option value="+33">+33 (FR)</option>
+                <option value="+27">+27 (ZA)</option>
+              </select>
+              <input type="tel" id="reg-phone" name="phone" placeholder="Phone number" required />
             </div>
           </div>
           <div class="form-group">

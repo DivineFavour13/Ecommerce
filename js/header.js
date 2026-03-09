@@ -106,6 +106,8 @@ function updateUserDropdown() {
   const adminLink = document.getElementById('admin-link');
   const loginLink = document.getElementById('login-link');
   const logoutLink = document.getElementById('logout-link');
+  const accountLink = document.getElementById('account-link');
+  const isAccountSubdir = window.location.pathname.includes('/account-settings/');
 
   if (!userName || !loginLink || !logoutLink) {
 
@@ -137,6 +139,9 @@ function updateUserDropdown() {
         adminLink.style.display = 'none';
       }
     }
+    if (accountLink) {
+      accountLink.href = isAccountSubdir ? '../account.html' : 'account.html';
+    }
     
 
   } else {
@@ -146,6 +151,9 @@ function updateUserDropdown() {
     if (adminLink) adminLink.style.display = 'none';
     loginLink.style.display = 'flex';
     logoutLink.style.display = 'none';
+    if (accountLink) {
+      accountLink.href = isAccountSubdir ? '../login.html' : 'login.html';
+    }
     
 
   }

@@ -62,9 +62,8 @@ function createUserDropdown(authLink, user) {
   dropdown.innerHTML = `
     <div class="dropdown-menu">
       ${user.role === 'admin' ? '<a href="admin.html"><i class="fas fa-cog"></i> Admin Panel</a>' : ''}
-      <a href="#" id="my-orders"><i class="fas fa-shopping-bag"></i> My Orders</a>
-      <a href="#" id="my-wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-      <a href="#" id="my-account"><i class="fas fa-user"></i> Account</a>
+      <a href="wishlist.html" id="my-wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+      <a href="account.html" id="my-account"><i class="fas fa-user"></i> Account</a>
       <div class="dropdown-divider"></div>
       <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>

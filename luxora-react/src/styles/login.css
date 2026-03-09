@@ -76,11 +76,12 @@
 
 .input-group i {
   position: absolute;
-  left: 1rem;
+  left: 1.1rem;
   color: var(--text-muted);
   z-index: 2;
   font-size: 1rem;
   transition: color 0.3s ease;
+  pointer-events: none;
 }
 
 .input-group input {
@@ -93,6 +94,10 @@
   transition: var(--transition-base);
   background: var(--bg-tertiary);
   color: var(--text-primary);
+}
+
+.input-group > i + input {
+  padding-left: 3.25rem;
 }
 
 .input-group select {
@@ -131,26 +136,37 @@
   box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
-.input-group input:focus + i {
+.input-group:focus-within i {
   color: var(--primary-color);
 }
 
 .password-toggle {
   position: absolute;
   right: 1rem;
-  background: none;
+  background: transparent !important;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0;
+  padding: 0.1rem;
   z-index: 2;
   transition: color 0.3s ease;
-  width: auto;
-  height: auto;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .password-toggle:hover {
+  background: transparent !important;
   color: var(--primary-color);
+  transform: none !important;
+}
+
+.password-toggle svg {
+  display: block;
 }
 
 .password-toggle:disabled {
@@ -447,11 +463,18 @@
 .form-group.success input {
   border-color: var(--success-color);
   background-color: #f8fff9;
+  color: var(--text-primary);
 }
 
 .form-group.success select {
   border-color: var(--success-color);
   background-color: #f8fff9;
+  color: var(--text-primary);
+}
+
+.form-group.success input::placeholder {
+  color: #6b7280;
+  opacity: 1;
 }
 
 .form-group.success .input-group i {
@@ -541,6 +564,18 @@
 
   .input-group input:focus {
     background: #4d4d4d;
+  }
+
+  .form-group.success input,
+  .form-group.success select {
+    background-color: #1f3a28;
+    border-color: #22c55e;
+    color: #e0e0e0;
+  }
+
+  .form-group.success input::placeholder {
+    color: #b0b0b0;
+    opacity: 1;
   }
 
   .demo-info {

@@ -423,3 +423,5 @@ console.log('Products loaded:', products.length);
 
 
 
+
+export default products;

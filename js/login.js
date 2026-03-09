@@ -177,8 +177,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const passwordInput = document.getElementById('reg-password');
       const confirmPasswordInput = document.getElementById('reg-confirm-password');
       const termsCheckbox = document.getElementById('terms-agreement');
+      const phoneInput = document.getElementById('reg-phone');
+      const countryCodeSelect = document.getElementById('reg-country-code');
 
-      if (nameInput && emailInput && passwordInput && confirmPasswordInput && termsCheckbox) {
+      if (nameInput && emailInput && passwordInput && confirmPasswordInput && termsCheckbox && phoneInput && countryCodeSelect) {
         // Generate random demo data
         const demoNames = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 'David Brown'];
         const randomName = demoNames[Math.floor(Math.random() * demoNames.length)];
@@ -188,6 +190,8 @@ document.addEventListener('DOMContentLoaded', function() {
         emailInput.value = randomEmail;
         passwordInput.value = 'demo123';
         confirmPasswordInput.value = 'demo123';
+        countryCodeSelect.value = '+234';
+        phoneInput.value = '8012345678';
         termsCheckbox.checked = true;
 
         // Clear any previous validation errors
@@ -195,6 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearFieldValidation(emailInput);
         clearFieldValidation(passwordInput);
         clearFieldValidation(confirmPasswordInput);
+        clearFieldValidation(phoneInput);
 
         showNotification('Demo account data filled! Click "Create Account" to proceed.', 'info');
       }
@@ -210,6 +215,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function validatePassword(password) {
     return password.length >= 6;
+  }
+
+  function validatePhone(phone) {
+    const digits = (phone || '').replace(/\D/g, '');
+    return digits.length >= 7 && digits.length <= 15;
   }
   
   function showFieldError(input, message) {
@@ -259,17 +269,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (emailInput) {
       emailInput.addEventListener('blur', function() {
-        if (!this.value) {
-          showFieldError(this, 'Email is required');
-        } else if (!validateEmail(this.value)) {
-          showFieldError(this, 'Please enter a valid email');
-        } else {
-          showFieldSuccess(this);
+        const value = this.value.trim();
+        if (!value) {
+          showFieldError(this, 'Email or phone is required');
+          return;
         }
+        if (value.includes('@')) {
+          if (!validateEmail(value)) {
+            showFieldError(this, 'Please enter a valid email');
+            return;
+          }
+        } else if (!validatePhone(value)) {
+          showFieldError(this, 'Please enter a valid phone number');
+          return;
+        }
+        showFieldSuccess(this);
       });
       
       emailInput.addEventListener('input', function() {
-        if (this.value && validateEmail(this.value)) {
+        const value = this.value.trim();
+        if (!value) return;
+        if (value.includes('@')) {
+          if (validateEmail(value)) showFieldSuccess(this);
+        } else if (validatePhone(value)) {
           showFieldSuccess(this);
         }
       });
@@ -294,6 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const regPasswordInputField = document.getElementById('reg-password');
     const regConfirmPasswordInputField = document.getElementById('reg-confirm-password');
     const termsCheckbox = document.getElementById('terms-agreement');
+    const regPhoneInput = document.getElementById('reg-phone');
     
     if (regEmailInput) {
       regEmailInput.addEventListener('blur', function() {
@@ -301,6 +324,18 @@ document.addEventListener('DOMContentLoaded', function() {
           showFieldError(this, 'Email is required');
         } else if (!validateEmail(this.value)) {
           showFieldError(this, 'Please enter a valid email');
+        } else {
+          showFieldSuccess(this);
+        }
+      });
+    }
+
+    if (regPhoneInput) {
+      regPhoneInput.addEventListener('blur', function() {
+        if (!this.value) {
+          showFieldError(this, 'Phone number is required');
+        } else if (!validatePhone(this.value)) {
+          showFieldError(this, 'Enter a valid phone number');
         } else {
           showFieldSuccess(this);
         }
@@ -381,26 +416,37 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Simulate login (replace with actual API call)
       setTimeout(() => {
-        const email = emailInput.value.toLowerCase();
-        
-        // Check credentials
-        let user = null;
-        if (email === 'admin@luxora.com') {
-          user = { email, role: 'admin', name: 'Admin User' };
-        } else if (email === 'user@luxora.com') {
-          user = { email, role: 'user', name: 'Regular User' };
-        } else {
-          user = { email, role: 'user', name: email.split('@')[0] };
-        }
-        
-        // Store user data
-        setCurrentUser(user);
+      const identifier = emailInput.value.trim();
+      const password = passwordInputField.value;
+
+      let user = null;
+      if (typeof authenticateUserByIdentifier === 'function') {
+        user = authenticateUserByIdentifier(identifier, password);
+      } else if (typeof authenticateUser === 'function' && identifier.includes('@')) {
+        user = authenticateUser(identifier, password);
+      }
+
+      if (!user) {
+        showNotification('Invalid email/phone or password', 'error');
+        btnText.style.display = 'inline-block';
+        btnLoading.style.display = 'none';
+        submitBtn.disabled = false;
+        return;
+      }
+
+      setCurrentUser(user);
+      if (typeof addLoginActivity === 'function') {
+        addLoginActivity(user, {
+          at: new Date().toISOString(),
+          device: navigator.userAgent || 'Unknown device'
+        });
+      }
         
         // Handle remember me
-        if (rememberMe && rememberMe.checked) {
-          localStorage.setItem('rememberMe', 'true');
-          localStorage.setItem('savedEmail', email);
-        }
+      if (rememberMe && rememberMe.checked) {
+        localStorage.setItem('rememberMe', 'true');
+        localStorage.setItem('savedEmail', identifier);
+      }
         
         showNotification('Login successful! Redirecting...', 'success');
         
@@ -431,12 +477,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const passwordInputField = document.getElementById('reg-password');
         const confirmPasswordInput = document.getElementById('reg-confirm-password');
         const termsCheckbox = document.getElementById('terms-agreement');
+        const phoneInput = document.getElementById('reg-phone');
+        const countryCodeSelect = document.getElementById('reg-country-code');
 
         // Clear previous errors
         if (nameInput) clearFieldValidation(nameInput);
         if (emailInput) clearFieldValidation(emailInput);
         if (passwordInputField) clearFieldValidation(passwordInputField);
         if (confirmPasswordInput) clearFieldValidation(confirmPasswordInput);
+        if (phoneInput) clearFieldValidation(phoneInput);
 
         // Validate
         let isValid = true;
@@ -450,10 +499,10 @@ document.addEventListener('DOMContentLoaded', function() {
           isValid = false;
         }
 
-        if (!emailInput) {
-          showNotification('Form error: Email field not found', 'error');
-          return;
-        }
+      if (!emailInput) {
+        showNotification('Form error: Email field not found', 'error');
+        return;
+      }
         if (!emailInput.value.trim()) {
           showFieldError(emailInput, 'Email is required');
           isValid = false;
@@ -462,10 +511,10 @@ document.addEventListener('DOMContentLoaded', function() {
           isValid = false;
         }
 
-        if (!passwordInputField) {
-          showNotification('Form error: Password field not found', 'error');
-          return;
-        }
+      if (!passwordInputField) {
+        showNotification('Form error: Password field not found', 'error');
+        return;
+      }
         if (!passwordInputField.value.trim()) {
           showFieldError(passwordInputField, 'Password is required');
           isValid = false;
@@ -474,10 +523,10 @@ document.addEventListener('DOMContentLoaded', function() {
           isValid = false;
         }
 
-        if (!confirmPasswordInput) {
-          showNotification('Form error: Confirm password field not found', 'error');
-          return;
-        }
+      if (!confirmPasswordInput) {
+        showNotification('Form error: Confirm password field not found', 'error');
+        return;
+      }
         if (!confirmPasswordInput.value.trim()) {
           showFieldError(confirmPasswordInput, 'Please confirm your password');
           isValid = false;
@@ -486,13 +535,26 @@ document.addEventListener('DOMContentLoaded', function() {
           isValid = false;
         }
 
-        if (!termsCheckbox) {
-          showNotification('Form error: Terms checkbox not found', 'error');
-          return;
-        }
+      if (!termsCheckbox) {
+        showNotification('Form error: Terms checkbox not found', 'error');
+        return;
+      }
+
+      if (!phoneInput || !countryCodeSelect) {
+        showNotification('Form error: Phone number field not found', 'error');
+        return;
+      }
+      if (!phoneInput.value.trim()) {
+        showFieldError(phoneInput, 'Phone number is required');
+        isValid = false;
+      } else if (!validatePhone(phoneInput.value.trim())) {
+        showFieldError(phoneInput, 'Enter a valid phone number');
+        isValid = false;
+      }
         if (!termsCheckbox.checked) {
           showNotification('Please agree to the Terms of Service', 'error');
-          isValid = false;
+          termsCheckbox.focus();
+          return;
         }
 
         if (!isValid) {
@@ -516,6 +578,8 @@ document.addEventListener('DOMContentLoaded', function() {
           const newUserData = {
             name: nameInput.value.trim(),
             email: emailInput.value.toLowerCase().trim(),
+            countryCode: countryCodeSelect.value,
+            phone: phoneInput.value.trim(),
             password: plainPassword,
           };
 
@@ -541,9 +605,17 @@ document.addEventListener('DOMContentLoaded', function() {
           const user = {
             name: newUserData.name,
             email: newUserData.email,
+            countryCode: newUserData.countryCode,
+            phone: newUserData.phone,
             role: 'user'
           };
           setCurrentUser(user);
+          if (typeof addLoginActivity === 'function') {
+            addLoginActivity(user, {
+              at: new Date().toISOString(),
+              device: navigator.userAgent || 'Unknown device'
+            });
+          }
 
           showNotification('Account created successfully! Redirecting...', 'success');
 
